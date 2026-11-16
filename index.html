@@ -296,7 +296,7 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
   <div class="wrap">
     <p class="role load-up">게임 기획자 · AI Game Maker</p>
     <h1 class="h-hero load-up d2">기획서에서<br>멈추지 않습니다.</h1>
-    <p class="lede load-up d3">무엇을 만들지와 AI가 따를 규칙은 제가 정하고, 코드는 AI가 씁니다. 그리고 제가 직접 플레이해서 고칩니다. 혼자서도 <b>플레이할 수 있는 빌드</b>까지 갑니다.</p>
+    <p class="lede load-up d3">무엇을 만들지, AI가 어떤 규칙을 따를지는 제가 정합니다. 코드는 AI가 쓰고, 저는 직접 플레이하며 고칩니다. 그렇게 혼자서도 <b>플레이할 수 있는 빌드</b>까지 만듭니다.</p>
     <div class="hero-cta load-up d3">
       <a class="btn" href="#greedy">대표 프로젝트 보기</a>
       <a class="more" style="margin:0" href="#ai">일하는 방식 보기 ›</a>
@@ -312,7 +312,7 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
   <div class="wrap">
     <p class="eyebrow">AI와 일하는 방식</p>
     <h2 class="h-xl">AI가 <span class="grad num">95%</span>를 하고,<br>저는 <span class="grad num">5%</span>를 풉니다.</h2>
-    <p class="lede">작업이 복잡할수록 어딘가에서 막힙니다. 그 막힌 곳을 찾아서 푸는 게 제 일입니다. AI에게 100%를 맡겨 봤더니 틀린 곳을 찾느라 시간이 오히려 더 들었습니다. 5%는 작업량으로 치면 작지만, 방향을 정하는 결정은 전부 여기에 있습니다.</p>
+    <p class="lede">작업이 복잡할수록 어딘가에서 막힙니다. 막힌 곳을 찾아 푸는 게 제 일입니다. AI에게 전부 맡겨 봤더니 틀린 곳을 찾느라 오히려 시간이 더 들었습니다. 5%는 양으로 치면 작아도 방향을 정하는 결정은 다 여기서 나옵니다.</p>
 
     <div class="split" role="img" aria-label="작업 비중 막대. AI 95퍼센트, 사람 5퍼센트">
       <div class="ai">구현 · 반복 수정 · 자동 검사 · 봇 시뮬레이션 · 보고서</div>
@@ -336,17 +336,15 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
   <div class="wrap">
     <div class="chap">
       <img src="img/gm-icon.jpg" width="512" height="512" alt="">
-      <div class="meta"><b>Greedy Marshmallow</b>Roblox · 1인 기획 + Claude Code 구현 · 2026.09.30 ~ 11.12</div>
+      <div class="meta"><b>Greedy Marshmallow</b>Roblox · 1인 기획 + Claude Code 구현 · 2026.09.30 ~ 개발 중</div>
     </div>
-    <h2 class="h-xl">7주, 혼자서,<br>로블록스 게임 하나.</h2>
-    <p class="lede">마시멜로를 불에 넣고 타기 직전에 빼는 게임입니다. 오래 버틸수록 배율이 올라가고, 욕심을 부리면 숯이 됩니다. 기획서와 규칙 문서, 피드백은 제가 쓰고 코드는 AI가 썼습니다. AI가 보고를 올릴 때마다 제가 직접 플레이해서 고칠 곳을 짚었습니다.</p>
+    <h2 class="h-xl">기획자 혼자<br>로블록스 게임을 만듭니다.</h2>
+    <p class="lede">마시멜로를 불에 넣고 타기 직전에 빼는 게임입니다. 오래 버틸수록 배율이 오르고, 욕심을 부리면 숯이 됩니다. 기획서와 규칙 문서는 제가 쓰고 코드는 AI가 씁니다. 지금까지 AI가 작업 보고를 208번 올렸고, 그때마다 제가 플레이해 보고 피드백을 남겼습니다. 아래 숫자는 그 과정에서 바로잡은 것들입니다.</p>
 
     <div class="bento">
-      <div class="tile s2"><span class="k">AI 작업 보고</span><span class="v num">208<small>회</small></span><p>작업 단위마다 AI가 보고서를 쓰고, 저는 읽고 플레이한 뒤 피드백을 남겼습니다.</p></div>
-      <div class="tile s2"><span class="k">결정 기록</span><span class="v num">327<small>줄</small></span><p>AI가 스스로 정한 값은 전부 이유와 함께 기획서 끝에 남게 했습니다.</p></div>
-      <div class="tile s2"><span class="k">커밋</span><span class="v num">477</span><p>기능 단위로 작게 나눴습니다. 10월 12일 이후 로컬 기록 기준입니다.</p></div>
-      <div class="tile s3"><span class="k">밸런스 시뮬레이션</span><span class="v num">3×2,000<small>판</small></span><p>반응 속도가 다른 봇 3종을 2,000판씩 돌려 굽기 규칙의 기댓값을 확인했습니다.</p></div>
-      <div class="tile s3"><span class="k">페이싱 검증</span><span class="v num">20<small>명</small> × 15<small>시간</small></span><p>봇 20명을 15시간 돌려 첫 환생이 언제 오는지 맞췄습니다.</p></div>
+      <div class="tile s2"><span class="k">처음 기획 표의 첫 환생</span><span class="v num">8<small>분</small></span><p>처음 짠 가격표로 봇을 돌리니 첫 환생이 8분 만에 왔습니다. 목표는 60~90분이었습니다. 표가 전시 1칸 기준으로 짜여 있던 게 원인이라 가격을 다시 잡아 53.6분까지 늘렸습니다.</p></div>
+      <div class="tile s2"><span class="k">첫 환생 시점</span><span class="v num">38<small>분</small></span><p>이후 목표를 35~45분으로 좁혀 다시 맞췄습니다. 두 번째 환생은 117분으로, 목표인 120분 근처입니다. 봇 시뮬레이션 중앙값입니다.</p></div>
+      <div class="tile s2"><span class="k">UI 겹침</span><span class="v num">0<small>건</small></span><p>폰과 태블릿에서 튜토리얼, 설정, 가방 등 23개 화면을 자동으로 검사해 버튼 그림과 글자가 겹치는 곳을 없앴습니다.</p></div>
     </div>
 
     <div class="duo">
@@ -361,14 +359,14 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
 <section class="white band">
   <div class="wrap">
     <p class="eyebrow">사람이 필요한 5%</p>
-    <h2 class="h-l">숫자는 거의 맞았습니다.<br>그런데 재미가 없었습니다.</h2>
-    <p class="lede">운에 맡기던 굽기를 열을 조절하는 방식으로 바꿨을 때 이야기입니다. 숫자는 목표 근처까지 왔는데, 직접 해 보니 너무 어려웠습니다.</p>
+    <h2 class="h-l">봇 결과는 괜찮았는데,<br>직접 해 보니 어려웠습니다.</h2>
+    <p class="lede">굽기를 운 대신 불 조절로 바꿨을 때 일입니다. 시뮬레이션 숫자만 보면 넘어가도 될 정도였습니다. 그런데 제가 해 보니 직관적이지 않고 어려웠습니다.</p>
 
     <ol class="steps">
       <li><h3>운에 맡기는 굽기</h3><p>넣는 순간 타는 시점이 정해지고, 플레이어는 언제 뺄지만 고릅니다.</p></li>
-      <li><h3>열 조절로 다시 설계</h3><p>실력이 결과에 닿도록 불 세기를 직접 조절하게 바꿨습니다.</p></li>
-      <li><h3>봇 시뮬레이션</h3><p>빠른 봇과 느린 봇의 기댓값 차이 3.6배. 목표(3.5배 이하)에 거의 닿았습니다.</p></li>
-      <li class="turn"><h3>직접 플레이: 어렵다</h3><p>온도 UI를 빼고 마시멜로 색으로 상태를 보여 주게 바꿨습니다. 그 뒤로는 AI 보고를 받으면 제가 먼저 플레이합니다.</p></li>
+      <li><h3>불 조절로 다시 설계</h3><p>잘하는 사람이 더 벌도록, 플레이어가 불 세기를 조절하게 바꿨습니다.</p></li>
+      <li><h3>봇 시뮬레이션</h3><p>빠른 봇이 느린 봇의 3.6배를 벌었습니다. 목표는 3.5배 이하였습니다.</p></li>
+      <li class="turn"><h3>직접 해 보니 어렵다</h3><p>온도 UI를 빼고, 마시멜로 색만 보고 판단하게 바꿨습니다. 그 뒤로는 AI 보고를 받으면 제가 먼저 플레이합니다.</p></li>
     </ol>
 
     <div class="sim" role="img" aria-label="봇 기댓값 비교. 느린 봇 1배, 빠른 봇 3.6배, 목표선 3.5배">
@@ -384,7 +382,7 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
         <span class="val">3.6×</span>
       </div>
       <div class="axis"><span></span><div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div><span></span></div>
-      <p class="small" style="margin:18px 0 0">각 2,000판. 숫자는 목표에 거의 닿았지만, 손으로 해 보면 결과가 달랐습니다.</p>
+      <p class="small" style="margin:18px 0 0">봇마다 2,000판씩 돌린 결과입니다.</p>
     </div>
   </div>
 </section>
@@ -397,7 +395,7 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
     <p class="lede">AI가 일일이 물어보면 제가 병목이 됩니다. 그래서 기획서의 항목마다 누가 정하는지를 먼저 적었습니다.</p>
     <div class="rules">
       <div class="rule fix"><span class="tag">[확정]</span><h3>AI가 바꿀 수 없는 것</h3><p>핵심 규칙과 수치. 웹 프로토타입에서 직접 만져 보고 정한 값이 기준입니다.</p></div>
-      <div class="rule free"><span class="tag">[재량]</span><h3>AI가 정하고 기록하는 것</h3><p>색, 아이콘, 배치처럼 취향이 들어가는 결정. 정한 뒤 이유를 결정 기록에 남기고, 저는 플레이해 보고 고칠 것만 짚습니다.</p></div>
+      <div class="rule free"><span class="tag">[재량]</span><h3>AI가 정하고 기록하는 것</h3><p>색, 아이콘, 배치처럼 취향이 들어가는 결정. 정한 뒤에는 이유를 결정 기록에 남깁니다. Greedy Marshmallow에서는 이 기록이 327줄이 됐고, 저는 플레이해 보고 고칠 것만 말합니다.</p></div>
       <div class="rule stop"><span class="tag">멈추고 묻기</span><h3>딱 세 가지</h3><p>돈이 드는 일, 게임 공개 설정 변경, 되돌릴 수 없는 삭제. 이것만 저에게 묻습니다.</p></div>
     </div>
   </div>
@@ -454,13 +452,13 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
       <div class="card">
         <span class="k">웹 내러티브 게임 · 2026.10 · 약 1주 · 개인 프로젝트</span>
         <h3>하르탄 배차실</h3>
-        <p>밸런스를 감으로 맞추지 않으려고 검사 도구 세 가지부터 설계했습니다.</p>
+        <p>밸런스를 감으로 맞추지 않으려고 검사 도구 세 가지부터 만들었습니다.</p>
         <ul>
           <li>게임 코드를 그대로 돌리는 밸런스 시뮬레이터, 전략 9종 × 200판</li>
           <li>말투 가이드를 기준으로 한 대사 감사, 어긋난 대사 104건 검출</li>
           <li>페르소나 4명이 서로 모르게 플레이하는 AI 플레이테스터</li>
         </ul>
-        <div class="stat"><span class="v num grad">94%</span><span>정직하게만 해도 3일째 밤에<br>목표 달성. 너무 쉽다는 걸 찾았습니다</span></div>
+        <div class="stat"><span class="v num grad">94%</span><span>정직하게만 해도 94%의 판이<br>3일째 밤에 목표를 채웠습니다. 너무 쉽다는 뜻입니다</span></div>
       </div>
     </div>
   </div>
@@ -480,7 +478,7 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
         <h3>미드나잇 클린업</h3>
         <p>귀신 들린 집을 친구들과 제한 시간 안에 청소하는 협동 게임. G-STAR 2024 KOCCA 부스에 전시했습니다.</p>
         <dl class="lessons">
-          <div><dt>그때 한 일</dt><dd>귀신과 장애물 출현을 파워 레벨과 엔티티 시스템으로 묶고, 조정할 값을 프로그래밍 팀에 요청해 매니저로 분리했습니다. 그 뒤로는 QA마다 숫자만 바꿔 다시 테스트했습니다. 2·3인 맵은 4인 맵 작업량의 50%·70% 규칙으로 줄였습니다.</dd></div>
+          <div><dt>그때 한 일</dt><dd>귀신과 장애물이 나오는 규칙을 파워 레벨과 엔티티 시스템으로 묶었습니다. 조정할 값은 프로그래밍 팀에 요청해 매니저로 따로 뺐고, 그 뒤로는 QA 때마다 숫자만 바꿔 다시 테스트했습니다. 2·3인 맵은 4인 맵 작업량의 50%·70% 규칙으로 줄였습니다.</dd></div>
           <div><dt>PM으로 한 일</dt><dd>기획서 작성 지침과 Notion 칸반을 만들어 12명이 같은 문서와 일정을 보게 했습니다. 기획자 셋의 의견 충돌로 2개월 작업이 폐기된 뒤에는 목표를 다시 잡아 끝까지 완성했습니다.</dd></div>
           <div><dt>결과</dt><dd>FGT 22명 중 밸런스 만족 27.3%. 최종 시연에서는 303명 중 81명이 가장 만족한 요소로 밸런스를 꼽아 2위가 됐습니다.</dd></div>
           <div class="now"><dt>지금 AI에게</dt><dd>바꿀 값과 바꾸면 안 되는 규칙을 먼저 나눠 줍니다. Greedy Marshmallow의 [확정]과 [재량]이 여기서 나왔습니다.</dd></div>
@@ -538,7 +536,7 @@ figcaption{font-size:13px;color:var(--mute);margin-top:10px}
     <h2 class="h-l">이력</h2>
     <div class="specs">
       <div class="spec"><h3>학력</h3><ul>
-        <li>가천대학교 컴퓨터공학과<span>2019.03 ~ 졸업 예정</span></li>
+        <li>가천대학교 컴퓨터공학과<span>2019.03 ~ 2027.02 졸업 예정</span></li>
         <li>한국콘텐츠진흥원 게임인재원 5기 기획 과정 수료<span>2023.03 ~ 2025.02</span></li>
       </ul></div>
       <div class="spec"><h3>AI 도구</h3><ul class="cols">
