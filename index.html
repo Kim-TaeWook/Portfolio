@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>김태욱 AI Game Maker</title>
+<meta name="description" content="기획하고, AI로 만들고, 직접 플레이해서 고치는 게임 기획자 김태욱의 포트폴리오">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<style>
+/* Layout: product-launch page. Alternating black and pale-grey bands, one giant headline per chapter, bento stat tiles. Single deliberate look (no theme switch). */
+:root{
+  color-scheme: light;
+  --black:#000;
+  --ink:#1d1d1f;
+  --paper:#f5f5f7;
+  --white:#fff;
+  --mute:#6e6e73;
+  --mute-d:#a1a1a6;
+  --line:#d2d2d7;
+  --line-d:#2c2c2e;
+  --tile-d:#141416;
+  --ember-1:#ffb340;   /* toasted marshmallow */
+  --ember-2:#ff5f2e;   /* campfire */
+  --link:#0066cc;
+  --link-d:#2997ff;
+  --ok:#30d158;
+  --f-kr:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"Inter Tight","Noto Sans KR",system-ui,sans-serif;
+  --wrap:1040px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--black);color:var(--ink);font-family:var(--f-kr);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:rgba(22,22,23,.92)}
+a{color:inherit}
+img{display:block;max-width:100%;height:auto}
+:focus-visible{outline:2px solid var(--link-d);outline-offset:3px;border-radius:4px}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px))}
+.band{padding-block:clamp(72px,11vw,140px)}
+.dark{background:var(--black);color:var(--white)}
+.grey{background:var(--paper);color:var(--ink)}
+.white{background:var(--white);color:var(--ink)}
+
+/* local nav */
+.lnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(22,22,23,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(255,255,255,.08);color:var(--white)}
+.lnav .wrap{display:flex;align-items:center;gap:20px;height:52px}
+.lnav .name{font-weight:700;font-size:19px;letter-spacing:-.01em;text-decoration:none;white-space:nowrap}
+.lnav nav{display:flex;gap:22px;margin-left:auto;font-size:12.5px;color:var(--mute-d);overflow-x:auto;scrollbar-width:none}
+.lnav nav::-webkit-scrollbar{display:none}
+.lnav nav a{text-decoration:none;white-space:nowrap}
+.lnav nav a:hover{color:var(--white)}
+.lnav .cta{background:var(--link);color:#fff;font-size:12px;padding:5px 12px;border-radius:980px;text-decoration:none;white-space:nowrap}
+@media (max-width:760px){.lnav nav{display:none}.lnav .cta{margin-left:auto}}
+
+/* type */
+.eyebrow{font-size:clamp(17px,1.9vw,21px);font-weight:700;color:var(--ember-1);margin:0 0 10px}
+.grey .eyebrow,.white .eyebrow{color:var(--ember-2)}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.025em}
+.h-hero{font-size:clamp(46px,9vw,104px);line-height:1.04;font-weight:900}
+.h-xl{font-size:clamp(36px,6.2vw,72px);line-height:1.08;font-weight:800}
+.h-l{font-size:clamp(28px,4.2vw,48px);line-height:1.14;font-weight:800}
+.h-m{font-size:clamp(21px,2.4vw,28px);line-height:1.3;font-weight:700}
+.lede{font-size:clamp(19px,2.2vw,24px);line-height:1.5;font-weight:500;color:var(--mute);max-width:36em;margin:22px 0 0;text-wrap:pretty}
+.dark .lede{color:var(--mute-d)}
+.lede b{color:var(--ink);font-weight:700}
+.dark .lede b{color:var(--white)}
+.center{text-align:center}
+.center .lede{margin-left:auto;margin-right:auto}
+.grad{background:linear-gradient(100deg,var(--ember-1) 10%,var(--ember-2) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:-.035em}
+.small{font-size:14px;color:var(--mute)}
+.dark .small{color:var(--mute-d)}
+.more{display:inline-flex;gap:6px;align-items:center;color:var(--link);text-decoration:none;font-size:17px;margin-top:22px}
+.dark .more{color:var(--link-d)}
+.more:hover{text-decoration:underline}
+
+/* hero */
+.hero{padding-block:clamp(56px,8vw,96px) 0;overflow:hidden}
+.hero .role{font-size:clamp(18px,2.2vw,24px);font-weight:700;color:var(--mute-d);margin:0 0 14px}
+.hero .lede{max-width:30em}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px 26px;justify-content:center;align-items:center;margin-top:30px}
+.btn{background:var(--link);color:#fff;text-decoration:none;padding:11px 22px;border-radius:980px;font-size:17px}
+.hero-art{margin-top:clamp(40px,6vw,72px);position:relative}
+.hero-art img{width:100%;border-radius:22px 22px 0 0}
+.hero-art::after{content:"";position:absolute;inset:auto 0 0;height:30%;background:linear-gradient(transparent,var(--black))}
+.load-up{animation:up .9s cubic-bezier(.2,.7,.2,1) both}
+.load-up.d2{animation-delay:.12s}.load-up.d3{animation-delay:.24s}
+@keyframes up{from{transform:translateY(18px);opacity:.15}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.load-up{animation:none}}
+
+/* 95/5 */
+.split{display:grid;grid-template-columns:95fr 5fr;gap:6px;margin-top:56px;height:84px;border-radius:14px;overflow:hidden}
+.split div{display:flex;align-items:center;padding:0 22px;font-weight:700;font-size:15px;min-width:0}
+.split .ai{background:linear-gradient(90deg,#2a2a2d,#3a3a3e);color:var(--mute-d)}
+.split .me{background:linear-gradient(180deg,var(--ember-1),var(--ember-2));padding:0;justify-content:center}
+.split-legend{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:40px}
+.split-legend .big{font-size:clamp(64px,11vw,128px);font-weight:800;line-height:1}
+.split-legend p{margin:10px 0 0;color:var(--mute-d);max-width:26em}
+@media (max-width:640px){.split-legend{grid-template-columns:1fr}}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:56px}
+.tile{background:var(--white);border-radius:22px;padding:30px 28px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.dark .tile{background:var(--tile-d)}
+.white .tile{background:var(--paper)}
+.tile .k{font-size:15px;font-weight:700;color:var(--mute)}
+.dark .tile .k{color:var(--mute-d)}
+.tile .v{font-size:clamp(44px,6vw,68px);font-weight:800;line-height:1.02}
+.tile .v small{font-size:.42em;font-weight:700;letter-spacing:-.01em;margin-left:2px}
+.tile p{margin:4px 0 0;font-size:15px;color:var(--mute);line-height:1.5}
+.dark .tile p{color:var(--mute-d)}
+.s2{grid-column:span 2}.s3{grid-column:span 3}.s4{grid-column:span 4}.s6{grid-column:span 6}
+@media (max-width:820px){.bento{grid-template-columns:repeat(2,1fr)}.s2,.s3{grid-column:span 1}.s4,.s6{grid-column:span 2}.bento>.tile:last-child:nth-child(odd){grid-column:span 2}}
+@media (max-width:460px){.bento{grid-template-columns:1fr}.s2,.s3,.s4,.s6,.bento>.tile:last-child:nth-child(odd){grid-column:span 1}}
+
+/* media */
+.shot{border-radius:22px;overflow:hidden;background:var(--line-d)}
+.shot img{width:100%}
+figure{margin:0}
+figcaption{font-size:13px;color:var(--mute);margin-top:10px}
+.dark figcaption{color:var(--mute-d)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:640px){.duo{grid-template-columns:1fr}}
+
+/* chapter header for project */
+.chap{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.chap img{width:64px;height:64px;border-radius:15px}
+.chap .meta{font-size:14px;color:var(--mute);line-height:1.45}
+.dark .chap .meta{color:var(--mute-d)}
+.chap .meta b{display:block;font-size:17px;color:var(--ink)}
+.dark .chap .meta b{color:var(--white)}
+
+/* roast story steps */
+.steps{list-style:none;padding:0;margin:48px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
+.steps li{background:var(--white);border-radius:20px;padding:26px 24px;min-width:0;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);font-family:var(--f-num);font-weight:700;font-size:13px;color:var(--mute);display:block;margin-bottom:12px}
+.steps li.turn{background:var(--ink);color:var(--white)}
+.steps li.turn::before{color:var(--ember-1)}
+.steps h3{font-size:19px;line-height:1.35;font-weight:700;letter-spacing:-.01em}
+.steps p{margin:8px 0 0;font-size:15px;color:var(--mute);line-height:1.55}
+.steps li.turn p{color:var(--mute-d)}
+@media (max-width:820px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.steps{grid-template-columns:1fr}}
+
+/* sim chart */
+.sim{background:var(--white);border-radius:22px;padding:32px 30px;margin-top:14px}
+.sim .row{display:grid;grid-template-columns:88px 1fr 64px;gap:14px;align-items:center;margin-top:14px;font-size:15px}
+.sim .track{position:relative;height:30px;background:var(--paper);border-radius:8px}
+.sim .bar{position:absolute;inset:0 auto 0 0;border-radius:8px}
+.sim .bar.slow{background:var(--line)}
+.sim .bar.fast{background:linear-gradient(90deg,var(--ember-1),var(--ember-2))}
+.sim .goal{position:absolute;top:-10px;bottom:-10px;width:0;border-left:2px dashed var(--ink)}
+.sim .goal span{position:absolute;top:-22px;left:-30px;width:60px;text-align:center;font-size:12px;font-weight:700;white-space:nowrap}
+.sim .val{font-family:var(--f-num);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.sim .axis{display:grid;grid-template-columns:88px 1fr 64px;gap:14px;margin-top:8px}
+.sim .ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);font-family:var(--f-num)}
+@media (max-width:460px){.sim{padding:26px 18px}.sim .row,.sim .axis{grid-template-columns:62px 1fr 46px;gap:8px}}
+
+/* rules */
+.rules{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:56px}
+.rule{border-radius:22px;padding:30px 28px;background:var(--tile-d);min-width:0}
+.rule .tag{display:inline-block;font-size:13px;font-weight:700;padding:3px 10px;border-radius:980px;border:1px solid currentColor;margin-bottom:16px}
+.rule.fix .tag{color:var(--ember-1)}
+.rule.free .tag{color:var(--link-d)}
+.rule.stop .tag{color:var(--ok)}
+.rule h3{font-size:21px;font-weight:700;line-height:1.35}
+.rule p{margin:10px 0 0;font-size:15px;color:var(--mute-d)}
+@media (max-width:820px){.rules{grid-template-columns:1fr}}
+
+/* workflow */
+.flow{list-style:none;padding:0;margin:56px 0 0;border-top:1px solid var(--line)}
+.flow li{display:grid;grid-template-columns:72px 1fr 1.25fr;gap:20px;padding:28px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.flow .n{font-family:var(--f-num);font-weight:700;font-size:15px;color:var(--ember-2)}
+.flow h3{font-size:21px;font-weight:700;line-height:1.35;letter-spacing:-.01em}
+.flow p{margin:0;color:var(--mute);font-size:16px;min-width:0}
+.flow code{font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;font-size:.88em;background:var(--paper);padding:1px 6px;border-radius:5px}
+@media (max-width:760px){.flow li{grid-template-columns:44px 1fr}.flow p{grid-column:2}}
+
+/* web game concepts */
+.concepts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px}
+.concept{border-radius:20px;padding:24px 22px;background:var(--white);min-width:0;border:1px solid var(--line)}
+.concept.pick{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.concept .lbl{font-family:var(--f-num);font-size:12px;font-weight:700;color:var(--mute);letter-spacing:.08em}
+.concept.pick .lbl{color:var(--ember-1)}
+.concept h3{font-size:19px;margin-top:12px;font-weight:700;line-height:1.35}
+.concept p{margin:8px 0 0;font-size:14px;color:var(--mute)}
+.concept.pick p{color:var(--mute-d)}
+@media (max-width:820px){.concepts{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.concepts{grid-template-columns:1fr}}
+
+/* more AI cards */
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:56px}
+.card{background:var(--tile-d);border-radius:22px;padding:34px 30px;min-width:0;display:flex;flex-direction:column}
+.card .k{font-size:14px;font-weight:700;color:var(--mute-d)}
+.card h3{font-size:clamp(24px,3vw,32px);font-weight:800;margin-top:6px}
+.card p{color:var(--mute-d);margin:14px 0 0;font-size:16px}
+.card ul{margin:16px 0 0;padding-left:18px;color:var(--mute-d);font-size:15px}
+.card ul li+li{margin-top:6px}
+.card .stat{margin-top:auto;padding-top:26px;display:flex;align-items:baseline;gap:10px}
+.card .stat .v{font-size:56px;font-weight:800;line-height:1}
+.card .stat span{font-size:14px;color:var(--mute-d)}
+@media (max-width:760px){.cards2{grid-template-columns:1fr}}
+
+/* roots gallery */
+.roots{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:56px}
+.proj{background:var(--white);border-radius:22px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.proj .img{aspect-ratio:16/9;overflow:hidden;background:var(--ink);max-width:100%}
+.proj .img img{width:100%;height:100%;object-fit:cover}
+.proj .body{padding:26px 28px 30px;display:flex;flex-direction:column;gap:6px;flex:1}
+.proj .sub{font-size:13px;color:var(--mute);font-weight:500}
+.proj h3{font-size:26px;font-weight:800}
+.proj p{margin:4px 0 0;color:var(--mute);font-size:15.5px}
+.proj .fig{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:auto;padding-top:18px}
+.proj .fig div{font-size:13px;color:var(--mute);line-height:1.3}
+.proj .fig b{display:block;font-family:var(--f-num);font-size:28px;color:var(--ink);font-weight:700;letter-spacing:-.03em}
+.proj.wide{grid-column:span 2;display:grid;grid-template-columns:1.1fr 1fr}
+.proj.wide .img{aspect-ratio:auto;min-height:100%}
+@media (max-width:760px){.roots{grid-template-columns:1fr}.proj.wide{grid-column:span 1;grid-template-columns:1fr}.proj.wide .img{aspect-ratio:16/9}}
+
+.awards{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.awards span{font-size:12.5px;font-weight:500;padding:5px 11px;border-radius:980px;background:var(--paper);color:var(--ink)}
+
+.minis{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+.mini{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;background:var(--white);border-radius:20px;padding:14px;min-width:0}
+.mini img{border-radius:12px;aspect-ratio:16/9;object-fit:cover;width:100%}
+.mini h3{font-size:18px;font-weight:700}
+.mini p{margin:4px 0 0;font-size:14px;color:var(--mute)}
+@media (max-width:760px){.minis{grid-template-columns:1fr}}
+@media (max-width:420px){.mini{grid-template-columns:1fr}}
+
+/* quote */
+.quote{font-size:clamp(30px,5vw,60px);line-height:1.2;font-weight:800;letter-spacing:-.03em;max-width:17em;margin:0 auto;text-wrap:balance}
+
+/* specs */
+.specs{margin-top:48px;border-top:1px solid var(--line)}
+.spec{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid var(--line)}
+.spec h3{font-size:19px;font-weight:700}
+.spec ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;min-width:0}
+.spec li{font-size:16px}
+.spec li span{display:block;font-size:14px;color:var(--mute)}
+.spec .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}
+@media (max-width:700px){.spec{grid-template-columns:1fr;gap:12px}.spec .cols{grid-template-columns:1fr}}
+
+/* contact */
+.contact .row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:36px}
+.pill{display:flex;align-items:center;gap:10px;background:var(--tile-d);border-radius:980px;padding:12px 14px 12px 22px;font-size:16px;min-width:0}
+.pill a{text-decoration:none;color:var(--link-d)}
+.pill button{font:inherit;font-size:13px;border:0;border-radius:980px;padding:6px 12px;background:#2c2c2e;color:var(--white);cursor:pointer}
+.pill button:hover{background:#3a3a3c}
+.foot{padding-block:28px 40px;font-size:12px;color:var(--mute-d);border-top:1px solid var(--line-d)}
+.foot .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<header class="lnav">
+  <div class="wrap">
+    <a class="name" href="#top">김태욱</a>
+    <nav aria-label="섹션">
+      <a href="#ai">AI 작업 방식</a>
+      <a href="#greedy">Greedy Marshmallow</a>
+      <a href="#webgame">웹 게임</a>
+      <a href="#roots">대표작</a>
+      <a href="#specs">이력</a>
+    </nav>
+    <a class="cta" href="#contact">연락하기</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="dark hero center">
+  <div class="wrap">
+    <p class="role load-up">게임 기획자 · AI Game Maker</p>
+    <h1 class="h-hero load-up d2">기획서에서<br>멈추지 않습니다.</h1>
+    <p class="lede load-up d3">기획은 제가 쓰고, 구현은 AI가 하고, 손맛은 제가 직접 플레이해서 봅니다. 혼자서도 <b>플레이할 수 있는 빌드</b>까지 갑니다.</p>
+    <div class="hero-cta load-up d3">
+      <a class="btn" href="#greedy">대표 프로젝트 보기</a>
+      <a class="more" style="margin:0" href="#ai">일하는 방식 보기 ›</a>
+    </div>
+    <figure class="hero-art">
+      <img src="img/gm-hero.jpg" width="1600" height="900" alt="Greedy Marshmallow 스토어 썸네일. 캐릭터 뒤로 x10,000배까지 커진 무지개색 마시멜로가 서 있다">
+    </figure>
+  </div>
+</section>
+
+<!-- 95 / 5 -->
+<section class="dark band" id="ai">
+  <div class="wrap">
+    <p class="eyebrow">AI와 일하는 방식</p>
+    <h2 class="h-xl">AI가 <span class="grad num">95%</span>를 하고,<br>저는 <span class="grad num">5%</span>를 풉니다.</h2>
+    <p class="lede">작업이 복잡할수록 어딘가에서 막힙니다. 그 막힌 곳을 찾아서 푸는 게 제 일입니다. AI에게 100%를 맡겨 봤더니 틀린 곳을 찾느라 시간이 오히려 더 들었습니다.</p>
+
+    <div class="split" role="img" aria-label="작업 비중 막대. AI 95퍼센트, 사람 5퍼센트">
+      <div class="ai">구현 · 반복 수정 · 자동 검사 · 봇 시뮬레이션 · 보고서</div>
+      <div class="me" aria-hidden="true"></div>
+    </div>
+    <div class="split-legend">
+      <div>
+        <div class="big num" style="color:var(--mute-d)">95%</div>
+        <p>AI가 맡는 일. 코드 작성, 맵 배치, 에셋 검사, UI 겹침 검사, 수천 판짜리 밸런스 시뮬레이션까지 기계가 할 수 있는 건 전부 넘깁니다.</p>
+      </div>
+      <div>
+        <div class="big num grad">5%</div>
+        <p>제가 맡는 일. 무엇을 만들지 정하고, 직접 플레이해서 재미없는 곳을 찾고, 숫자로는 안 보이는 손맛을 판단합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GREEDY MARSHMALLOW -->
+<section class="grey band" id="greedy">
+  <div class="wrap">
+    <div class="chap">
+      <img src="img/gm-icon.jpg" width="512" height="512" alt="">
+      <div class="meta"><b>Greedy Marshmallow</b>Roblox · 1인 기획 + Claude Code 구현 · 2026.09.30 ~ 11.12</div>
+    </div>
+    <h2 class="h-xl">7주, 혼자서,<br>로블록스 게임 하나.</h2>
+    <p class="lede">마시멜로를 불에 넣고 타기 직전에 빼는 게임입니다. 오래 버틸수록 배율이 올라가고, 욕심을 부리면 숯이 됩니다. 기획서와 피드백은 제가 쓰고, 구현은 AI가 했습니다.</p>
+
+    <div class="bento">
+      <div class="tile s2"><span class="k">AI 작업 보고</span><span class="v num">208<small>회</small></span><p>작업 단위마다 AI가 보고서를 쓰고, 저는 읽고 플레이한 뒤 피드백을 남겼습니다.</p></div>
+      <div class="tile s2"><span class="k">결정 기록</span><span class="v num">327<small>줄</small></span><p>AI가 스스로 정한 값은 전부 이유와 함께 기획서 끝에 남게 했습니다.</p></div>
+      <div class="tile s2"><span class="k">커밋</span><span class="v num">477</span><p>기능 단위로 작게, 메시지는 한국어로.</p></div>
+      <div class="tile s3"><span class="k">밸런스 시뮬레이션</span><span class="v num">3×2,000<small>판</small></span><p>반응 속도가 다른 봇 3종을 2,000판씩 돌려 굽기 규칙의 기댓값을 확인했습니다.</p></div>
+      <div class="tile s3"><span class="k">페이싱 검증</span><span class="v num">20<small>명</small> × 15<small>시간</small></span><p>봇 20명을 15시간 돌려 첫 환생이 언제 오는지 맞췄습니다.</p></div>
+    </div>
+
+    <div class="duo">
+      <figure class="shot"><img src="img/gm-roast.jpg" width="1600" height="900" alt="스토어 썸네일. 타기 직전에 빼라는 문구와 x250 배율 배지"></figure>
+      <figure class="shot"><img src="img/gm-days.jpg" width="1600" height="900" alt="1일차와 100일차 캠프를 나란히 비교한 썸네일"></figure>
+    </div>
+    <p class="small" style="margin-top:10px">스토어 썸네일. 게임의 재미가 한 장면에 보이도록 기획했습니다.</p>
+  </div>
+</section>
+
+<!-- the 5% story -->
+<section class="white band">
+  <div class="wrap">
+    <p class="eyebrow">사람이 필요한 5%</p>
+    <h2 class="h-l">시뮬레이션은 통과했습니다.<br>그런데 재미가 없었습니다.</h2>
+    <p class="lede">운에 맡기던 굽기를 열을 조절하는 방식으로 바꿨을 때 이야기입니다. 숫자는 목표 안에 들어왔는데, 직접 해 보니 너무 어려웠습니다.</p>
+
+    <ol class="steps">
+      <li><h3>운에 맡기는 굽기</h3><p>넣는 순간 타는 시점이 정해지고, 플레이어는 언제 뺄지만 고릅니다.</p></li>
+      <li><h3>열 조절로 다시 설계</h3><p>실력이 결과에 닿도록 불 세기를 직접 조절하게 바꿨습니다.</p></li>
+      <li><h3>봇 시뮬레이션 통과</h3><p>빠른 봇과 느린 봇의 기댓값 차이 3.6배. 목표 3.5배 바로 위였습니다.</p></li>
+      <li class="turn"><h3>직접 플레이: 어렵다</h3><p>온도 UI를 빼고 마시멜로 색으로 상태를 보여 주게 바꿨습니다. 그 뒤로는 AI 보고를 받으면 제가 먼저 플레이합니다.</p></li>
+    </ol>
+
+    <div class="sim" role="img" aria-label="봇 기댓값 비교. 느린 봇 1배, 빠른 봇 3.6배, 목표선 3.5배">
+      <div class="small" style="font-weight:700;color:var(--ink)">반응 속도별 봇 기댓값 (느린 봇 = 1)</div>
+      <div class="row">
+        <span>느린 봇</span>
+        <div class="track"><div class="bar slow" style="width:25%"></div><div class="goal" style="left:87.5%"><span>목표 3.5배</span></div></div>
+        <span class="val">1.0×</span>
+      </div>
+      <div class="row">
+        <span>빠른 봇</span>
+        <div class="track"><div class="bar fast" style="width:90%"></div><div class="goal" style="left:87.5%"></div></div>
+        <span class="val">3.6×</span>
+      </div>
+      <div class="axis"><span></span><div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div><span></span></div>
+      <p class="small" style="margin:18px 0 0">각 2,000판. 숫자는 통과에 가까웠지만 손으로 해 보면 결과가 달랐습니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- rules for AI -->
+<section class="dark band">
+  <div class="wrap">
+    <p class="eyebrow">AI에게 일을 맡기는 규칙</p>
+    <h2 class="h-xl">AI가 묻지 않고<br>정할 수 있게.</h2>
+    <p class="lede">AI가 일일이 물어보면 제가 병목이 됩니다. 그래서 기획서의 항목마다 누가 정하는지를 먼저 적었습니다.</p>
+    <div class="rules">
+      <div class="rule fix"><span class="tag">[확정]</span><h3>AI가 바꿀 수 없는 것</h3><p>핵심 규칙과 수치. 웹 프로토타입에서 직접 만져 보고 정한 값이 기준입니다.</p></div>
+      <div class="rule free"><span class="tag">[재량]</span><h3>AI가 정하고 기록하는 것</h3><p>색, 아이콘, 배치처럼 취향이 들어가는 결정. 정한 뒤 이유를 결정 기록에 남깁니다.</p></div>
+      <div class="rule stop"><span class="tag">멈추고 묻기</span><h3>딱 세 가지</h3><p>돈이 드는 일, 게임 공개 설정 변경, 되돌릴 수 없는 삭제. 이것만 저에게 묻습니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- workflow -->
+<section class="grey band">
+  <div class="wrap">
+    <p class="eyebrow">작업 흐름</p>
+    <h2 class="h-xl">저장소마다<br>같은 다섯 단계.</h2>
+    <ol class="flow">
+      <li><span class="n">01</span><h3>느낌은 웹 프로토타입으로</h3><p>브라우저에서 고쳐 보며 정한 상수를 기획서의 기준으로 삼습니다.</p></li>
+      <li><span class="n">02</span><h3>규칙은 CLAUDE.md에</h3><p>문서 우선순위, AI가 혼자 정해도 되는 범위, 멈추고 물어야 할 세 가지를 저장소 맨 위에 적습니다.</p></li>
+      <li><span class="n">03</span><h3>엔진은 MCP로, 원본은 파일로</h3><p>로블록스는 Rojo로 코드를 파일로 빼고 Studio MCP로 맵을 배치합니다. 모델은 Blender 파이썬 스크립트로 만듭니다.</p></li>
+      <li><span class="n">04</span><h3>보고 받고, 플레이하고, 다시 적기</h3><p>AI가 작업마다 보고서를 쓰면 저는 플레이한 뒤 피드백을 기획서에 다시 적습니다. 승인 요청은 hook으로 디스코드에 옵니다.</p></li>
+      <li><span class="n">05</span><h3>검사는 자동으로, 손맛은 제가</h3><p>폰 해상도 네 가지에서 UI 겹침을 찾고 봇 시뮬레이션을 돌립니다. 기계가 판단 못 하는 손맛만 제가 봅니다.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- web game -->
+<section class="white band" id="webgame">
+  <div class="wrap">
+    <p class="eyebrow">Web Game 제작</p>
+    <h2 class="h-xl">고르기 전에<br>네 개를 만들어 봅니다.</h2>
+    <p class="lede">기획서로만 컨셉을 비교하면 말이 길어집니다. 레퍼런스를 같은 기준으로 분석해 빈자리를 찾고, 후보 컨셉 네 개를 전부 브라우저에서 플레이되는 프로토타입으로 만들어 직접 해 보고 비교했습니다.</p>
+    <div class="concepts">
+      <div class="concept"><span class="lbl">A · 탈출맵</span><h3>한 칸만 더</h3><p>박자에 맞춰 터지는 바닥을 피해 출구까지. 죽으면 1초 안에 다시 시작합니다.</p></div>
+      <div class="concept"><span class="lbl">B · 떼싸움 성장</span><h3>눈덩이 군단</h3><p>자동으로 쏟아지는 병력을 이끌고, 잡을수록 진화합니다.</p></div>
+      <div class="concept"><span class="lbl">C · 미니게임</span><h3>30초 생존</h3><p>30초마다 규칙이 바뀌는 도전을 목숨 3개로 버팁니다.</p></div>
+      <div class="concept pick"><span class="lbl">D · 협동 생존</span><h3>구조대가 올 때까지</h3><p>낮에는 물자를 모으고 밤에는 좀비를 막습니다. 4구역에서 10밤을 버티는 판까지 키웠습니다.</p></div>
+    </div>
+    <div class="bento" style="margin-top:14px">
+      <div class="tile s2"><span class="k">분석 기준</span><span class="v num">5<small>개</small></span><p>핵심 루프, 30초 안에 배우는가, 한 판 1~10분, 다시 누를 이유, 브라우저 적합성.</p></div>
+      <div class="tile s2"><span class="k">분석한 장르</span><span class="v num">15</span><p>스타크래프트 유즈맵 9개 장르와 플래시 시절 웹게임 6개 유형.</p></div>
+      <div class="tile s2"><span class="k">뺀 장르</span><span class="v num">5</span><p>타워 디펜스, AoS, 랜덤 디펜스, 마피아, 술래잡기. 이미 큰 독립 게임이 있는 곳입니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- more AI -->
+<section class="dark band">
+  <div class="wrap">
+    <p class="eyebrow">그 밖의 AI 작업</p>
+    <h2 class="h-xl">AI가 "됩니다"라고 해도<br>직접 확인합니다.</h2>
+    <div class="cards2">
+      <div class="card">
+        <span class="k">Epic Unreal Engine AI MegaJam · 프로젝트 OneTake</span>
+        <h3>STEEL JUSTICE</h3>
+        <p>제작사가 액션물로 고친 극장판을 플레이하면서, 덧붙인 것을 가위로 잘라 내면 감독의 원래 영화가 드러나는 게임입니다. 약 45시간 만에 9장면이 끝까지 이어지는 빌드를 만들었습니다.</p>
+        <p>AI는 자동 조종으로 "끝까지 돈다"고 보고했습니다. 제가 직접 해 보니 처음 하는 사람은 뭘 해야 할지 알 수 없었습니다.</p>
+        <div class="stat"><span class="v num grad">4<small style="font-size:.4em">번</small></span><span>AI가 된다고 보고했지만<br>직접 해 보고 방향을 바꾼 횟수</span></div>
+      </div>
+      <div class="card">
+        <span class="k">웹 · 운영 시뮬레이션</span>
+        <h3>하르탄 배차실</h3>
+        <p>밸런스를 감으로 맞추지 않으려고 검사 도구부터 만들었습니다.</p>
+        <ul>
+          <li>밸런스 시뮬레이터로 수치 조정 결과를 미리 확인</li>
+          <li>AI 플레이테스터로 사람 대신 판을 끝까지 돌려 보기</li>
+          <li>대사 감사로 말투와 개연성 점검</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- roots -->
+<section class="grey band" id="roots">
+  <div class="wrap">
+    <p class="eyebrow">AI 이전부터</p>
+    <h2 class="h-xl">재미를 숫자로<br>확인해 왔습니다.</h2>
+    <p class="lede">AI를 쓰기 전에도 방식은 같았습니다. 빨리 만들어 보고, 테스트하고, 숫자로 고쳤습니다.</p>
+
+    <div class="roots">
+      <article class="proj wide">
+        <div class="img"><img src="img/pia-mine.jpg" width="684" height="384" alt="피아 플레이 화면. 지뢰를 밟은 발과 해체 도구"></div>
+        <div class="body">
+          <span class="sub">Unity · 3주 · 밸런스·UI·시스템 기획, 프로그래밍 총괄</span>
+          <h3>피아</h3>
+          <p>자기가 밟은 지뢰를 직접 해체하는 게임. 한 발을 고정한 채 손가락이 꼬이는 키 배치와 페달 컨트롤러로, 불편한 조작 자체를 긴장감으로 만들었습니다.</p>
+          <div class="awards">
+            <span>BIC 2024 Public Pick</span><span>TGS 2024 Sense of Wonder Night · Pocky Award</span><span>G-STAR 2024 Best Experiment</span><span>버닝비버 2024 기획 전시</span>
+          </div>
+          <div class="fig"><div><b>3</b>국내외 수상</div><div><b>15</b>언론 보도 (국내 8 · 일본 7)</div></div>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="img"><img src="img/midnight.jpg" width="480" height="270" alt="미드나잇 클린업 타이틀 화면"></div>
+        <div class="body">
+          <span class="sub">Unreal Engine 5 · 8개월 · 12인 · 시스템·레벨·밸런스, PM</span>
+          <h3>미드나잇 클린업</h3>
+          <p>귀신 들린 집을 친구들과 청소하는 협동 게임. 귀신 출현 확률을 파워 레벨로 묶고 파라미터를 분리해, QA마다 숫자만 바꿔 다시 테스트했습니다.</p>
+          <div class="fig"><div><b>27.3→63.2%</b>밸런스 만족 비율</div><div><b>+35.9%p</b>FGT 22명 → G-STAR 303명</div></div>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="img"><img src="img/nightwish.jpg" width="800" height="450" alt="NightWish 타이틀 화면"></div>
+        <div class="body">
+          <span class="sub">Unity · 2025.09 ~ 진행 중 · 메인 기획</span>
+          <h3>NightWish</h3>
+          <p>낮엔 고등학생, 밤엔 특수요원인 로그라이트 슈팅. 기획자가 혼자 남은 뒤 데이터를 스키마와 CSV로 나누고, 매크로 한 번으로 엔진 데이터가 나오게 했습니다.</p>
+          <div class="fig"><div><b>14</b>데이터 테이블</div><div><b>47</b>개정 기록</div></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="minis">
+      <div class="mini"><img src="img/tiktok.jpg" width="770" height="436" alt="틱톡 가디언즈 플레이 화면"><div><h3>틱톡 가디언즈</h3><p>자체 엔진 · 4주 · 기획 총괄. 이전 캐릭터의 행동이 클론으로 남는 퍼즐. 2024 인디크래프트 TOP20.</p></div></div>
+      <div class="mini"><img src="img/hojeop.jpg" width="860" height="483" alt="호접지몽 타이틀 화면"><div><h3>호접지몽</h3><p>자체 엔진 · 3주 · 기획 총괄. 점대칭 순간이동 퍼즐 플랫포머. 유니티로 레벨을 먼저 검증했습니다.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- belief -->
+<section class="dark band center">
+  <div class="wrap">
+    <p class="eyebrow">게임을 보는 관점</p>
+    <p class="quote">누가 무슨 도구로 만들었든<br>재미있으면 뜹니다.<br><span class="grad">그 재미가 보이게 만드는 것까지</span><br>기획입니다.</p>
+  </div>
+</section>
+
+<!-- specs -->
+<section class="white band" id="specs">
+  <div class="wrap">
+    <h2 class="h-l">이력</h2>
+    <div class="specs">
+      <div class="spec"><h3>학력</h3><ul>
+        <li>가천대학교 컴퓨터공학과<span>2019.03 ~ 졸업 예정</span></li>
+        <li>한국콘텐츠진흥원 게임인재원 5기 기획 과정 수료<span>2023.03 ~ 2025.02</span></li>
+      </ul></div>
+      <div class="spec"><h3>AI 도구</h3><ul class="cols">
+        <li>Claude Code<span>저장소 단위 구현, hook·MCP 연결</span></li>
+        <li>Roblox Studio MCP · Rojo<span>맵 배치, 플레이테스트, 코드 동기화</span></li>
+        <li>Blender Python<span>스크립트로 3D 모델 생성</span></li>
+        <li>봇 시뮬레이션<span>밸런스·페이싱 검증</span></li>
+      </ul></div>
+      <div class="spec"><h3>엔진 · 도구</h3><ul class="cols">
+        <li>Unity · Unreal Engine 5<span>프로토타입, UI·시스템 구현</span></li>
+        <li>Excel VBA<span>기댓값 시뮬레이터, 데이터 편집 도구</span></li>
+        <li>Figma · Photoshop · Blender<span>UI 목업, 그래픽, 간단한 모델링</span></li>
+        <li>Notion · SVN · GitHub<span>일정·문서·버전 관리</span></li>
+      </ul></div>
+      <div class="spec"><h3>수상 · 전시</h3><ul>
+        <li>피아 · BIC 2024 Special Public Pick</li>
+        <li>피아 · TGS 2024 Selected Indie 80, Pocky Award</li>
+        <li>피아 · G-STAR 2024 Indie Awards Best Experiment</li>
+        <li>틱톡 가디언즈 · 2024 인디크래프트 TOP20</li>
+        <li>미드나잇 클린업 · G-STAR 2024 KOCCA 부스 전시, 유저 투표 2위</li>
+      </ul></div>
+      <div class="spec"><h3>병역</h3><ul><li>대한민국 육군 병장 만기 전역<span>2021.05 ~ 2022.11</span></li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- contact -->
+<section class="dark band center contact" id="contact">
+  <div class="wrap">
+    <h2 class="h-xl">같이 만들어 봐요.</h2>
+    <p class="lede">플레이 영상과 기획서 원본은 아래 링크에 있습니다.</p>
+    <div class="row">
+      <div class="pill"><span id="mail">hak8734@naver.com</span><button type="button" id="copy-mail">복사</button></div>
+      <div class="pill"><a href="https://www.youtube.com/watch?v=Y15nkJbljTc&amp;list=PLi6b7sJgqK90qlfDS7lxhOks1vKPyWwv9" target="_blank" rel="noopener">플레이 영상 모음 ›</a></div>
+      <div class="pill"><a href="https://github.com/Kim-TaeWook" target="_blank" rel="noopener">GitHub ›</a></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="dark foot">
+  <div class="wrap">
+    <span>김태욱 · 게임 기획자</span>
+    <span>이 페이지도 Claude와 함께 만들었습니다.</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('copy-mail').addEventListener('click', function(){
+  var b=this, t=document.getElementById('mail').textContent;
+  function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('mail'));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨';}
+  try{navigator.clipboard.writeText(t).then(function(){b.textContent='복사됨';},sel);}catch(e){sel();}
+  setTimeout(function(){b.textContent='복사';},1800);
+});
+</script>
+
+</body>
+</html>
