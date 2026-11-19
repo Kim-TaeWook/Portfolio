@@ -1,0 +1,815 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>마시멜로 굽기 실험실</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* layout: 한 장짜리 실험대 — 위 모드 고르기, 가운데 모닥불 캔버스, 아래 규칙·기록 두 칸 (폰에선 한 칸) */
+:root {
+  --night: #141a2b;      /* 배경 밤하늘 */
+  --night-2: #1d2540;    /* 카드 */
+  --line: #2f3a5e;       /* 경계 */
+  --ink: #f3ead9;        /* 글자 — 마시멜로 크림 */
+  --ink-2: #a9a6b8;      /* 흐린 글자 */
+  --ember: #ff8a3d;      /* 강조 — 불씨 */
+  --gold: #ffc94d;       /* 황금빛 */
+  --char: #e2574c;       /* 탐·위험 */
+  --leaf: #7fd18b;       /* 성공 */
+  --display: "Jua", "IBM Plex Sans KR", system-ui, sans-serif;
+  --body: "IBM Plex Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme: dark;
+}
+html, body { background: var(--night); color: var(--ink); }
+body { font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 780px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 16px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0; letter-spacing: 0.5px; text-wrap: balance; }
+.lede { margin: 2px 0 0; color: var(--ink-2); max-width: 62ch; }
+.modes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.mode { all: unset; cursor: pointer; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--night-2); display: grid; gap: 2px; min-width: 0; align-content: start; }
+.mode b { font-family: var(--display); font-weight: 400; font-size: 18px; }
+.mode span { color: var(--ink-2); font-size: 12.5px; line-height: 1.4; }
+.mode[aria-pressed="true"] { border-color: var(--ember); box-shadow: inset 0 0 0 1px var(--ember); }
+.mode.new b::after { content: "NEW"; font-family: var(--body); font-size: 10px; font-weight: 700; color: #1b1208; background: var(--gold); border-radius: 999px; padding: 1px 6px; margin-left: 6px; vertical-align: 3px; }
+.mode:focus-visible, .pull:focus-visible, .snd:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.stage { position: relative; border-radius: 16px; overflow: hidden; border: 1.5px solid var(--line); background: #0d1220; }
+canvas { display: block; width: 100%; aspect-ratio: 4 / 3; max-width: 100%; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.hint { color: var(--ink-2); font-size: 13.5px; min-width: 0; flex: 1 1 260px; }
+.hint kbd { font-family: var(--body); font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; color: var(--ink); background: var(--night-2); }
+.btns { display: flex; gap: 8px; align-items: center; }
+.snd { all: unset; cursor: pointer; font-size: 13px; color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+.pull { font-family: var(--display); font-size: 22px; color: #1b1208; background: var(--gold); border: 0; border-radius: 12px; padding: 10px 26px; cursor: pointer; }
+.pull:disabled { opacity: 0.35; cursor: default; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 620px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mode { padding: 9px 10px; } .mode b { font-size: 16px; } .mode span { display: none; }
+}
+.card { background: var(--night-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.card h2 { font-family: var(--display); font-weight: 400; font-size: 19px; margin: 0 0 6px; }
+.card ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.tag { display: inline-block; font-size: 12px; border-radius: 999px; padding: 1px 8px; margin-right: 4px; border: 1px solid currentColor; }
+.tag.luck { color: var(--gold); }
+.tag.skill { color: var(--leaf); }
+.tag.pop { color: #ff8fbf; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+th { color: var(--ink-2); font-weight: 500; }
+td.num { text-align: right; }
+.reset { all: unset; cursor: pointer; color: var(--ink-2); font-size: 12.5px; text-decoration: underline; margin-top: 8px; display: inline-block; }
+.foot { color: var(--ink-2); font-size: 12.5px; }
+@media (prefers-reduced-motion: reduce) { .mode { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>마시멜로 굽기 실험실</h1>
+    <p class="lede">A~C는 타는 순간을 누가 정하느냐만 다른 굽기야. D는 C의 손맛에 떼는 순간 터지는 곱하기 보너스와 돌연변이를 얹은 버전, E는 실전 곡선(배율 절반 속도 · 황금 1% · 무지개 0.1%). D랑 E를 번갈아 해 봐.</p>
+  </header>
+
+  <nav class="modes" aria-label="굽기 방식">
+    <button class="mode" id="m-a" data-mode="A" aria-pressed="true"><b>A · 지금 방식</b><span>서버가 숨긴 운명에서 탄다</span></button>
+    <button class="mode" id="m-b" data-mode="B" aria-pressed="false"><b>B · 연기 신호</b><span>운명은 그대로, 타기 전에 연기가 난다</span></button>
+    <button class="mode" id="m-c" data-mode="C" aria-pressed="false"><b>C · 불 조절</b><span>면 온도를 내가 관리, 넘치면 탄다</span></button>
+    <button class="mode" id="m-d" data-mode="D" aria-pressed="false"><b>D · 한 끗</b><span>C + 떼는 순간 보너스가 곱해진다</span></button>
+    <button class="mode new" id="m-e" data-mode="E" aria-pressed="false"><b>E · 실전 곡선</b><span>배율 절반 속도 · 황금 1% · 무지개 0.1%</span></button>
+  </nav>
+
+  <div class="stage"><canvas id="cv" aria-label="모닥불 위 마시멜로. 누르고 있으면 굽는다"></canvas></div>
+
+  <div class="bar">
+    <div class="hint" id="hint"></div>
+    <div class="btns">
+      <button class="snd" id="snd" aria-pressed="true">소리 켬</button>
+      <button class="pull" id="pull" hidden>떼기</button>
+    </div>
+  </div>
+
+  <div class="cols">
+    <section class="card" aria-labelledby="rule-h">
+      <h2 id="rule-h">규칙</h2>
+      <div id="rules"></div>
+    </section>
+    <section class="card" aria-labelledby="rec-h">
+      <h2 id="rec-h">이 모드 기록</h2>
+      <table>
+        <tbody>
+          <tr><th>판</th><td class="num" id="s-n">0</td></tr>
+          <tr><th>탄 판</th><td class="num" id="s-burn">0</td></tr>
+          <tr><th>한 판 평균 받은 배율</th><td class="num" id="s-avg">–</td></tr>
+          <tr><th>최고</th><td class="num" id="s-best">–</td></tr>
+        </tbody>
+      </table>
+      <button class="reset" id="reset">기록 지우기</button>
+      <p class="foot" id="s-note"></p>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const hintEl = document.getElementById('hint');
+  const pullBtn = document.getElementById('pull');
+  const sndBtn = document.getElementById('snd');
+  const rulesEl = document.getElementById('rules');
+
+  const RATE = 0.24, MAX = 10000;
+  const C = { HEAT_DOWN: 30, HEAT_SIDE: 9, HEAT_TOP: 2.5, COOL: 22, COND: 0.15, GROW: 0.85, OFF: 20, EXP: 1.6, TELE: 0.45, MELT: 20 };
+  // D 보너스
+  const BONUS = { EDGE1: 93, EDGE2: 97, EVEN_MIN: 60, EVEN_SPREAD: 8, GOLD: 0.07, RAIN: 0.01 };
+
+  const RULES = {
+    A: `<ul>
+      <li><span class="tag skill">조작</span>꾹 누르면 굽고, 떼면 빼.</li>
+      <li><span class="tag luck">운</span>타는 배율(운명)은 시작할 때 정해지고 안 보여. 절반은 x2 전에 타.</li>
+      <li>어디서 떼든 장기 평균은 거의 같아. 기록의 '한 판 평균'이 0.99 근처로 모이는지 봐.</li>
+    </ul>`,
+    B: `<ul>
+      <li><span class="tag skill">조작</span>A와 같아. 꾹 = 굽기, 떼기 = 빼기.</li>
+      <li><span class="tag luck">운</span>운명은 그대로 숨겨져 있어.</li>
+      <li><span class="tag skill">실력</span>운명의 55~85% 지점부터 연기가 나고, 93%부터는 지글거리며 떨려. 연기를 보고 얼마나 더 버틸지가 내 판단이야.</li>
+    </ul>`,
+    C: `<ul>
+      <li><span class="tag skill">조작</span>꾹 = 불에 넣기, 손 떼기 = 들어서 식히기, 누른 채 좌우로 끌기 = 돌리기, <b>떼기 버튼</b> = 빼기.</li>
+      <li><span class="tag skill">실력</span>불 쪽 면이 제일 빨리 뜨거워져. 어느 면이든 100이 되면 탄다. 돌리고 들었다 넣었다 하면서 버텨.</li>
+      <li><span class="tag luck">운</span>가끔 불길이 솟아. 처음엔 대부분 0.45초 전에 일렁이지만, 배율이 높을수록 예고 없는 불길이 늘고 세져. 마시멜로마다 잘 타는 정도도 달라(왼쪽 아래 표시).</li>
+      <li>배율은 불에 넣고 있을 때만, 뜨거울수록 훨씬 빨리 오른다. 불 속에 20초 있으면 녹기 직전이라 그 배율로 자동으로 빠져.</li>
+    </ul>`,
+    D: `<ul>
+      <li><span class="tag skill">조작</span>C와 똑같아. 불·면 온도·불길 규칙도 같아.</li>
+      <li><span class="tag skill">실력</span>떼는 순간의 굽기 상태에 따라 보너스가 <b>곱해져</b>.
+        제일 뜨거운 면 ${BONUS.EDGE1}↑ = <b>한 끗 ×2</b>, ${BONUS.EDGE2}↑ = <b>종이 한 장 ×3</b>.
+        네 면이 다 ${BONUS.EVEN_MIN}↑이고 차이가 ${BONUS.EVEN_SPREAD} 이내 = <b>골고루 ×2</b>.</li>
+      <li><span class="tag luck">운</span>굽기 배율이 x2·x4·x8…을 넘을 때마다 <b>황금 마시멜로 ×3</b>(${Math.round(BONUS.GOLD * 100)}%) 또는 <b>무지개 ×10</b>(${Math.round(BONUS.RAIN * 100)}%)으로 변할 수 있어. 태우면 같이 날아가.</li>
+      <li><span class="tag pop">보는 법</span>위 큰 숫자 = 지금 떼면 받는 배율. 칩이 켜지는 순간 숫자가 튀어. 다 곱하면 x100도 나와.</li>
+    </ul>`
+  };
+  RULES.E = `<ul>
+      <li><span class="tag skill">조작</span>D와 똑같아. 한 끗 ×2 · 종이 한 장 ×3 · 골고루 ×2도 같아. <b>배율은 D의 절반 속도</b>로 올라 — 굽기만으로는 x2~x4, 칩 다 켜면 x8~x13이 보통. 큰 숫자는 변이 몫.</li>
+      <li><span class="tag luck">운</span>성장 변이는 <b>판당 한 번</b>, 굽기 배율이 x2를 넘는 순간에만 굴려: 황금 ×3 = 1%, 무지개 ×10 = 0.1% (Grow a Garden 수치).</li>
+      <li>실전 느낌 확인용. 100판에 한 번 황금이 나오는 게 맞는지, 그래도 매판 한 끗·골고루로 손맛이 남는지 봐.</li>
+    </ul>`;
+  const HINTS = {
+    A: '누르고 있으면 굽고 떼면 빼. <kbd>Space</kbd> 꾹 / 화면 꾹',
+    B: '누르고 있으면 굽고 떼면 빼. 연기를 봐. <kbd>Space</kbd> 꾹 / 화면 꾹',
+    C: '꾹 = 불에 넣기 · 좌우로 끌기 = 돌리기 (<kbd>A</kbd> <kbd>D</kbd>) · 빼기는 떼기 버튼 (<kbd>E</kbd>)',
+    D: 'C와 같은 조작 · 위 칩이 켜졌을 때 떼면 곱해져 (<kbd>Space</kbd> 꾹 · <kbd>A</kbd> <kbd>D</kbd> 돌리기 · <kbd>E</kbd> 떼기)',
+    E: 'D와 같은 조작 · 배율 절반 속도 · 황금 1% · 무지개 0.1% (<kbd>Space</kbd> 꾹 · <kbd>A</kbd> <kbd>D</kbd> 돌리기 · <kbd>E</kbd> 떼기)'
+  };
+  const MODES = ['A', 'B', 'C', 'D', 'E'];
+  const isTag = () => mode === 'D' || mode === 'E';
+  const isHeat = () => mode === 'C' || isTag() || mode === 'E';
+
+  // ---------- 기록 (이 브라우저에만)
+  const blank = () => ({ n: 0, burn: 0, sum: 0, best: 0 });
+  let stats = { A: blank(), B: blank(), C: blank(), D: blank(), E: blank() };
+  try { const s = JSON.parse(localStorage.getItem('roastlab-stats') || 'null'); if (s) MODES.forEach(k => { if (s[k] && typeof s[k].n === 'number') stats[k] = s[k]; }); } catch (e) {}
+  const saveStats = () => { try { localStorage.setItem('roastlab-stats', JSON.stringify(stats)); } catch (e) {} };
+
+  // ---------- 소리 (WebAudio, 첫 입력 때 켜짐)
+  let actx = null, soundOn = true;
+  try { if (localStorage.getItem('roastlab-sound') === 'off') soundOn = false; } catch (e) {}
+  function ensureAudio() {
+    if (!soundOn) return;
+    try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch (e) { actx = null; }
+  }
+  function tone(f, d = 0.15, type = 'triangle', v = 0.07, when = 0, glideTo = null) {
+    if (!soundOn || !actx) return;
+    try {
+      const t0 = actx.currentTime + when;
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t0);
+      if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t0 + d);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(v, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + d + 0.03);
+    } catch (e) {}
+  }
+  const SND = {
+    pull: () => { tone(660, 0.12); tone(990, 0.2, 'triangle', 0.06, 0.07); },
+    burn: () => { tone(320, 0.7, 'sawtooth', 0.05, 0, 55); tone(90, 0.5, 'square', 0.03, 0.05, 40); },
+    tele: () => tone(150, 0.3, 'sine', 0.06, 0, 110),
+    mile: k => tone(523 * Math.pow(2, k / 6), 0.14, 'triangle', 0.06),
+    tagOn: () => { tone(880, 0.08, 'square', 0.035); tone(1320, 0.16, 'square', 0.035, 0.06); },
+    mut: rain => { const ns = rain ? [523, 659, 784, 1047, 1319, 1568] : [523, 659, 784, 1047]; ns.forEach((f, i) => tone(f, 0.18, 'triangle', 0.06, i * 0.07)); },
+    slam: i => { tone(196 * Math.pow(2, i / 3), 0.2, 'square', 0.05); tone(98 * Math.pow(2, i / 3), 0.25, 'sine', 0.07); },
+    final: v => { [523, 659, 784].concat(v >= 30 ? [1047] : []).concat(v >= 100 ? [1319] : []).forEach((f, i) => tone(f, 0.6, 'triangle', 0.045, i * 0.03)); }
+  };
+
+  // ---------- 상태
+  let mode = 'A';
+  try { const m = localStorage.getItem('roastlab-mode'); if (MODES.includes(m)) mode = m; } catch (e) {}
+  let holding = false, needRelease = false;
+  let st = 'ready';          // ready | roasting | result
+  let t = 0, m = 1, D = 0, r = 0.7;
+  let res = null, resT = 0;  // 결과 표시
+  let lower = 0;             // 0 = 들림, 1 = 불 안 (보간)
+  let smoke = [], embers = [];
+  // C·D
+  let fireT = 0, heat = [0, 0, 0, 0], down = 0, spinVis = 0, nextFlare = 0, flareTele = true, flareT = -1, flareShow = 0, kind = { k: 1, name: '보통' };
+  let dragX = null, dragAcc = 0, teleWas = false;
+  // D
+  let mut = 1, nextMs = 2, msIdx = 0, pops = [], bump = 0, lastPot = 1, lastTagScore = 1, shake = 0, confetti = [], banner = null;
+
+  const fmt = x => x >= 1000 ? 'x' + Math.round(x).toLocaleString('ko-KR') : x >= 100 ? 'x' + x.toFixed(0) : x >= 10 ? 'x' + x.toFixed(1) : 'x' + x.toFixed(2);
+  function destiny() { const u = Math.random(); return Math.min(MAX, Math.max(1.5, 0.99 / (1 - u))); }
+  function scheduleFlare() {
+    const lg = Math.log10(Math.max(1, m));
+    const mean = 2.6 / (1 + 0.7 * lg);
+    nextFlare = t + (-Math.log(1 - Math.random())) * mean + 0.5;
+    flareTele = Math.random() < Math.max(0.3, 0.8 - 0.15 * lg);
+  }
+  function tagsNow() {
+    const H = Math.max(...heat), L = Math.min(...heat);
+    const edge = H >= BONUS.EDGE2 ? 3 : H >= BONUS.EDGE1 ? 2 : 1;
+    const even = (L >= BONUS.EVEN_MIN && H - L <= BONUS.EVEN_SPREAD) ? 2 : 1;
+    return { edge, even, H, L };
+  }
+  const potNow = () => { const g = tagsNow(); return m * g.edge * g.even * mut; };
+  const mutName = x => x >= 10 ? '무지개' : x >= 3 ? '황금' : '';
+
+  function startRound() {
+    st = 'roasting'; t = 0; m = 1; res = null; shake = 0;
+    if (isHeat()) {
+      heat = [0, 0, 0, 0]; down = 0; spinVis = 0; flareShow = 0; fireT = 0; teleWas = false;
+      mut = 1; nextMs = 2; msIdx = 0; pops = []; bump = 0; lastPot = 1; lastTagScore = 1; banner = null;
+      const roll = Math.random();
+      kind = roll < 0.3 ? { k: 0.85, name: '말랑한 마시멜로 (덜 탐)' } : roll < 0.8 ? { k: 1, name: '보통 마시멜로' } : { k: 1.2, name: '잘 타는 마시멜로 (열 ×1.2)' };
+      scheduleFlare();
+    } else {
+      D = destiny(); r = 0.55 + Math.random() * 0.3; smoke = [];
+    }
+    pullBtn.disabled = !isHeat();
+  }
+  function finish(burned, value) {
+    st = 'result'; resT = 0; banner = null; pops = [];
+    const g = tagsNow();
+    res = { burned, value, D: isHeat() ? null : D, kind: kind.name, maxHeat: g.H, melt: isHeat() && fireT >= C.MELT, revealEnd: 0 };
+    if (isTag()) {
+      res.base = m; res.mut = mut; res.lost = lastPot;
+      res.steps = [];
+      if (!burned) {
+        if (g.edge === 3) res.steps.push({ label: '종이 한 장', x: 3 }); else if (g.edge === 2) res.steps.push({ label: '한 끗', x: 2 });
+        if (g.even === 2) res.steps.push({ label: '골고루', x: 2 });
+        if (mut > 1) res.steps.push({ label: mutName(mut), x: mut, mut: true });
+      }
+      res.finalAt = 0.4 + 0.38 * res.steps.length;
+      res.revealEnd = burned ? 0 : res.finalAt + 0.55;
+      res.finalFired = false;
+    }
+    const s = stats[mode]; s.n++; if (burned) s.burn++; else { s.sum += value; s.best = Math.max(s.best, value); }
+    saveStats(); renderStats();
+    if (burned) { SND.burn(); shake = 9; } else if (mode !== 'D') SND.pull();
+    if (holding) needRelease = true;
+    pullBtn.disabled = true;
+  }
+
+  // ---------- 입력
+  function press() {
+    ensureAudio();
+    if (holding) return;
+    holding = true;
+    if (st === 'result' && res && resT < res.revealEnd) { resT = res.revealEnd; return; } // 연출 건너뛰기
+    if (st === 'ready' && !needRelease) startRound();
+  }
+  function release() {
+    holding = false; needRelease = false; dragX = null; dragAcc = 0;
+    if (st === 'roasting' && !isHeat()) finish(false, m);
+  }
+  function rotate(dir) {
+    if (!isHeat() || st !== 'roasting') return;
+    down = (down + dir + 4) % 4;
+  }
+  function pull() { if (isHeat() && st === 'roasting') finish(false, isTag() ? potNow() : m); }
+
+  cv.addEventListener('pointerdown', e => { e.preventDefault(); cv.setPointerCapture(e.pointerId); dragX = e.clientX; dragAcc = 0; press(); });
+  cv.addEventListener('pointermove', e => {
+    if (!holding || dragX === null) return;
+    dragAcc += e.clientX - dragX; dragX = e.clientX;
+    const step = 34;
+    while (dragAcc > step) { rotate(1); dragAcc -= step; }
+    while (dragAcc < -step) { rotate(-1); dragAcc += step; }
+  });
+  const up = () => { if (holding) release(); };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  window.addEventListener('keydown', e => {
+    if (e.target && e.target.closest && e.target.closest('button') && (e.code === 'Space' || e.code === 'Enter')) return;
+    if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) press(); }
+    else if (e.code === 'KeyA' || e.code === 'ArrowLeft') rotate(-1);
+    else if (e.code === 'KeyD' || e.code === 'ArrowRight') rotate(1);
+    else if (e.code === 'KeyE' || e.code === 'Enter') { ensureAudio(); pull(); }
+  });
+  window.addEventListener('keyup', e => { if (e.code === 'Space') { e.preventDefault(); release(); } });
+  pullBtn.addEventListener('click', e => { ensureAudio(); pull(); if (e.detail > 0) pullBtn.blur(); });
+  document.getElementById('reset').addEventListener('click', () => { stats[mode] = blank(); saveStats(); renderStats(); });
+  function renderSnd() { sndBtn.textContent = soundOn ? '소리 켬' : '소리 끔'; sndBtn.setAttribute('aria-pressed', String(soundOn)); }
+  sndBtn.addEventListener('click', () => { soundOn = !soundOn; try { localStorage.setItem('roastlab-sound', soundOn ? 'on' : 'off'); } catch (e) {} renderSnd(); ensureAudio(); });
+
+  function setMode(next) {
+    mode = next; try { localStorage.setItem('roastlab-mode', mode); } catch (e) {}
+    document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+    st = 'ready'; res = null; holding = false; needRelease = false; m = 1; t = 0; heat = [0, 0, 0, 0]; smoke = []; mut = 1; pops = []; banner = null; confetti = [];
+    rulesEl.innerHTML = RULES[mode]; hintEl.innerHTML = HINTS[mode];
+    pullBtn.hidden = !isHeat(); pullBtn.disabled = true;
+    renderStats();
+  }
+  document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', e => { setMode(b.dataset.mode); if (e.detail > 0) b.blur(); })); // 마우스로 고르면 포커스를 풀어 Space가 굽기로 가게
+
+  function renderStats() {
+    const s = stats[mode];
+    document.getElementById('s-n').textContent = s.n;
+    document.getElementById('s-burn').textContent = s.n ? `${s.burn} (${Math.round(s.burn / s.n * 100)}%)` : '0';
+    document.getElementById('s-avg').textContent = s.n ? fmt(s.sum / s.n) : '–';
+    document.getElementById('s-best').textContent = s.best ? fmt(s.best) : '–';
+    document.getElementById('s-note').textContent =
+      mode === 'A' ? '탄 판은 0으로 쳐서 평균을 낸다. A는 판이 쌓일수록 어디서 떼든 0.99 근처로 모인다.'
+      : isTag() ? '탄 판은 0으로 친다. D는 보너스가 곱해져서 숫자 크기를 A·C와 비교하면 안 돼. 손맛만 비교해 — 경제는 방향 정한 뒤 다시 맞춰.'
+      : '탄 판은 0으로 쳐서 평균을 낸다. A보다 평균이 높으면 내 판단이 결과를 바꾼 거야.';
+  }
+
+  // ---------- 갱신
+  function update(dt) {
+    lower += ((holding && st === 'roasting') ? 1 - lower : -lower) * Math.min(1, dt * 10);
+    spinVis += (down - spinVis + (Math.abs(down - spinVis) > 2 ? (down > spinVis ? -4 : 4) : 0)) * Math.min(1, dt * 14);
+    if (Math.abs(spinVis - down) > 2) spinVis = down;
+    if (st === 'result') {
+      resT += dt;
+      if (isTag() && !res.burned && !res.finalFired && resT >= res.finalAt) {
+        res.finalFired = true; SND.final(res.value);
+        shake = Math.min(16, 3 + 5 * Math.log10(Math.max(1, res.value)));
+        if (res.value >= 8) burst(Math.round(18 + 34 * Math.log10(res.value)));
+      }
+      if (resT > res.revealEnd + 1.4 && !holding) { st = 'ready'; heat = [0, 0, 0, 0]; mut = 1; down = 0; spinVis = 0; }
+    }
+    if (st === 'roasting') {
+      if (isHeat()) updateHeat(dt); else if (holding) {
+        t += dt; m = Math.min(MAX, Math.exp(RATE * t));
+        if (m >= D) { m = D; finish(true, 0); }
+      }
+    }
+    // 연기 (B)
+    if (mode === 'B' && st === 'roasting') {
+      const ratio = m / D;
+      const inten = ratio < r ? 0 : Math.min(1, (ratio - r) / (1 - r));
+      const n = inten * 40 * dt;
+      for (let i = 0; i < n + (Math.random() < (n % 1) ? 1 : 0); i++) smoke.push({ x: (Math.random() - 0.5) * 30, y: 0, vx: (Math.random() - 0.5) * 14, vy: -30 - Math.random() * 30, life: 0, max: 1.4 + Math.random(), s: 6 + inten * 10 });
+    }
+    smoke.forEach(p => { p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.s += 10 * dt; });
+    smoke = smoke.filter(p => p.life < p.max);
+    if (Math.random() < dt * 12) embers.push({ x: (Math.random() - 0.5) * 60, y: 0, vy: -40 - Math.random() * 60, vx: (Math.random() - 0.5) * 20, life: 0, max: 1 + Math.random() * 1.2 });
+    embers.forEach(p => { p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; });
+    embers = embers.filter(p => p.life < p.max);
+    pops.forEach(p => p.life += dt); pops = pops.filter(p => p.life < p.max);
+    confetti.forEach(p => { p.life += dt; p.vy += 520 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; });
+    confetti = confetti.filter(p => p.life < p.max);
+    if (banner) { banner.life += dt; if (banner.life > banner.max) banner = null; }
+    if (flareShow > 0) flareShow -= dt;
+    bump = Math.max(0, bump - dt * 3.2);
+    shake = Math.max(0, shake - dt * 30);
+  }
+
+  function updateHeat(dt) {
+    if (isTag()) lastPot = potNow();
+    t += dt;
+    const inFire = holding;
+    const k = kind.k;
+    if (inFire) {
+      fireT += dt;
+      heat[down] += C.HEAT_DOWN * k * dt;
+      heat[(down + 1) % 4] += C.HEAT_SIDE * k * dt;
+      heat[(down + 3) % 4] += C.HEAT_SIDE * k * dt;
+      heat[(down + 2) % 4] += C.HEAT_TOP * k * dt;
+    } else {
+      for (let i = 0; i < 4; i++) heat[i] = Math.max(0, heat[i] - C.COOL * dt);
+    }
+    const mean = heat.reduce((a, b) => a + b, 0) / 4;
+    for (let i = 0; i < 4; i++) heat[i] += (mean - heat[i]) * C.COND * dt;
+    if (inFire) {
+      const lvl = Math.max(0, Math.min(1, (mean - C.OFF) / (100 - C.OFF)));
+      m = Math.min(MAX, m * Math.exp((mode === 'E' ? 0.45 : C.GROW) * Math.pow(lvl, C.EXP) * dt));
+    }
+    // D: 마일스톤마다 돌연변이 굴림
+    if (isTag()) {
+      while (m >= nextMs) {
+        msIdx++;
+        const roll = Math.random();
+        let got = 0;
+        const pr = mode === 'E' ? 0.001 : BONUS.RAIN, pg = mode === 'E' ? 0.01 : BONUS.GOLD;
+        const canRoll = mode !== 'E' || nextMs === 2; // E: 판당 한 번 (x2 넘는 순간)
+        if (canRoll && roll < pr && mut < 10) got = 10; else if (canRoll && roll < pr + pg && mut < 3) got = 3;
+        if (got) { mut = got; banner = { text: got >= 10 ? '무지개 마시멜로!' : '황금 마시멜로!', sub: `×${got} — 태우면 같이 날아가`, rain: got >= 10, life: 0, max: 1.8 }; SND.mut(got >= 10); bump = 1; }
+        else { pops.push({ text: `x${nextMs} 돌파`, life: 0, max: 1.0 }); SND.mile(msIdx); }
+        nextMs *= 2;
+      }
+    }
+    // 불길
+    flareT = nextFlare - t;
+    const teleNow = flareTele && flareT > 0 && flareT < C.TELE;
+    if (teleNow && !teleWas) SND.tele();
+    teleWas = teleNow;
+    if (t >= nextFlare) {
+      flareShow = 0.5;
+      if (inFire) {
+        const lg = Math.log10(Math.max(1, m));
+        heat[down] += 22 + 12 * lg;
+        heat[(down + 1) % 4] += 6; heat[(down + 3) % 4] += 6;
+      }
+      scheduleFlare();
+    }
+    if (Math.max(...heat) >= 100) { heat = heat.map(h => Math.min(100, h)); finish(true, 0); return; }
+    if (isTag()) {
+      const g = tagsNow(), score = g.edge * g.even;
+      if (score > lastTagScore) { SND.tagOn(); bump = 1; }
+      lastTagScore = score;
+    }
+    if (fireT >= C.MELT) finish(false, isTag() ? potNow() : m);
+  }
+
+  function burst(n) {
+    const cols = ['#ffc94d', '#ff8a3d', '#ff8fbf', '#7fd18b', '#8fc8ff', '#f3ead9'];
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, sp = 260 + Math.random() * 380;
+      confetti.push({ x: W / 2, y: H * 0.42, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 14, c: cols[i % cols.length], life: 0, max: 1.3 + Math.random() * 0.8, s: 4 + Math.random() * 4 });
+    }
+  }
+
+  // ---------- 그리기
+  let W = 0, H = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const rect = cv.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  new ResizeObserver(resize).observe(cv);
+
+  const mix = (a, b, f) => a.map((v, i) => Math.round(v + (b[i] - v) * f));
+  const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+  const TOAST = [[1, [246, 238, 220]], [2, [242, 212, 150]], [5, [222, 160, 82]], [15, [168, 102, 46]], [60, [104, 62, 32]], [300, [62, 40, 26]]];
+  function toastColor(x) {
+    if (x <= TOAST[0][0]) return TOAST[0][1];
+    for (let i = 1; i < TOAST.length; i++) if (x <= TOAST[i][0]) {
+      const a = TOAST[i - 1], b = TOAST[i];
+      return mix(a[1], b[1], (Math.log(x) - Math.log(a[0])) / (Math.log(b[0]) - Math.log(a[0])));
+    }
+    return TOAST[TOAST.length - 1][1];
+  }
+  function heatColor(h) {
+    if (h < 40) return mix([246, 238, 220], [240, 200, 120], h / 40);
+    if (h < 75) return mix([240, 200, 120], [190, 110, 50], (h - 40) / 35);
+    return mix([190, 110, 50], [235, 70, 50], Math.min(1, (h - 75) / 25));
+  }
+  function tierColor(v, tt) {
+    if (v >= 100) return `hsl(${(tt * 140) % 360},95%,72%)`;
+    if (v >= 50) return '#ff8fbf';
+    if (v >= 20) return '#ff8a3d';
+    if (v >= 5) return '#ffc94d';
+    return '#f3ead9';
+  }
+  function rr(x, y, w, h, rad) { ctx.beginPath(); ctx.moveTo(x + rad, y); ctx.arcTo(x + w, y, x + w, y + h, rad); ctx.arcTo(x + w, y + h, x, y + h, rad); ctx.arcTo(x, y + h, x, y, rad); ctx.arcTo(x, y, x + w, y, rad); ctx.closePath(); }
+  const px = f => Math.max(11, Math.round(H * f));
+
+  function draw(now) {
+    const tt = now / 1000;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    if (shake > 0) ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    // 하늘
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0e1426'); g.addColorStop(0.7, '#1a2140'); g.addColorStop(1, '#241d22');
+    ctx.fillStyle = g; ctx.fillRect(-20, -20, W + 40, H + 40);
+    ctx.fillStyle = 'rgba(243,234,217,0.5)';
+    for (let i = 0; i < 40; i++) { const x = (i * 97.3) % W, y = (i * 53.7) % (H * 0.45); ctx.fillRect(x, y, 1.2, 1.2); }
+    // 땅
+    const fx = W * 0.5, fy = H * 0.86;
+    ctx.fillStyle = '#2a2224'; ctx.beginPath(); ctx.ellipse(fx, fy + 6, W * 0.42, H * 0.08, 0, 0, Math.PI * 2); ctx.fill();
+    // 불빛
+    const glowR = H * (0.42 + (flareShow > 0 ? 0.12 : 0));
+    const gl = ctx.createRadialGradient(fx, fy - H * 0.06, 0, fx, fy - H * 0.06, glowR);
+    gl.addColorStop(0, 'rgba(255,150,60,0.35)'); gl.addColorStop(1, 'rgba(255,150,60,0)');
+    ctx.fillStyle = gl; ctx.fillRect(0, 0, W, H);
+    // 장작
+    ctx.lineCap = 'round';
+    [[-0.13, 0.03, 0.1, -0.02], [0.13, 0.03, -0.1, -0.02], [-0.02, 0.04, 0.09, 0.0]].forEach(l => {
+      ctx.strokeStyle = '#6b4227'; ctx.lineWidth = H * 0.035;
+      ctx.beginPath(); ctx.moveTo(fx + W * l[0], fy + H * l[1]); ctx.lineTo(fx + W * l[2], fy + H * l[3]); ctx.stroke();
+    });
+    // 불꽃 (불길이 솟을 때 + 예고 일렁임)
+    const tele = isHeat() && st === 'roasting' && flareTele && flareT > 0 && flareT < C.TELE;
+    const boost = (flareShow > 0 ? 0.6 * (flareShow / 0.5) : 0) + (tele ? 0.25 + 0.15 * Math.sin(tt * 60) : 0);
+    const fh = H * (0.2 + 0.18 * boost);
+    const layers = [['#ff6a2b', 1, 0.16], ['#ff9a3c', 0.78, 0.12], ['#ffd25a', 0.55, 0.08], ['#fff2c4', 0.3, 0.04]];
+    layers.forEach(([c, s, wv], li) => {
+      ctx.fillStyle = c; ctx.beginPath();
+      const w = W * 0.13 * s, h = fh * s;
+      ctx.moveTo(fx - w, fy);
+      for (let k = 0; k <= 20; k++) {
+        const a = k / 20, x = fx - w + 2 * w * a;
+        const peak = Math.sin(Math.PI * a);
+        const wob = Math.sin(tt * (7 + li) + a * 9 + li) * wv * H * 0.15;
+        ctx.lineTo(x + wob * 0.3, fy - h * Math.pow(peak, 0.8) - wob);
+      }
+      ctx.lineTo(fx + w, fy); ctx.closePath(); ctx.fill();
+    });
+    embers.forEach(p => { ctx.fillStyle = `rgba(255,200,90,${1 - p.life / p.max})`; ctx.fillRect(fx + p.x, fy - H * 0.05 + p.y, 2, 2); });
+
+    // 마시멜로 위치
+    const s = Math.min(W, H) * 0.15;
+    const mx = fx, my = (fy - H * 0.46) + lower * H * 0.2;
+    // 꼬치
+    ctx.strokeStyle = '#c9a77a'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(W * 0.97, my - H * 0.12); ctx.stroke();
+
+    const burned = res && res.burned && st === 'result';
+    if (isHeat()) drawMarshC(mx, my, s, burned, tt); else drawMarshAB(mx, my, s, burned, tt);
+
+    // 연기
+    smoke.forEach(p => { const a = 0.35 * (1 - p.life / p.max); ctx.fillStyle = `rgba(190,190,200,${a})`; ctx.beginPath(); ctx.arc(mx + p.x, my - s * 0.5 + p.y, p.s, 0, Math.PI * 2); ctx.fill(); });
+
+    // 위험 테두리 (C·D)
+    if (isHeat() && st === 'roasting') {
+      const hot = Math.max(...heat);
+      if (hot > 85) {
+        const a = Math.min(1, (hot - 85) / 15) * (0.28 + 0.12 * Math.sin(tt * 14));
+        const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
+        vg.addColorStop(0, 'rgba(226,87,76,0)'); vg.addColorStop(1, `rgba(226,87,76,${a})`);
+        ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+      }
+    }
+
+    // 배율
+    if (isTag()) drawTopD(tt, tele);
+    else {
+      ctx.textAlign = 'center';
+      ctx.fillStyle = burned ? '#e2574c' : '#f3ead9';
+      ctx.font = `${Math.round(H * 0.11)}px Jua, sans-serif`;
+      const shown = st === 'ready' ? 'x1.00' : fmt(st === 'result' && !res.burned ? res.value : m);
+      ctx.fillText(shown, W * 0.5, H * 0.15);
+      ctx.font = `${px(0.042)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillStyle = '#a9a6b8';
+      ctx.fillText(statusLine(tele), W * 0.5, H * 0.215);
+    }
+
+    if (isHeat() && st !== 'ready') {
+      ctx.textAlign = 'left'; ctx.fillStyle = kind.k > 1 ? '#ffc94d' : '#a9a6b8';
+      ctx.font = `${px(0.036)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillText(kind.name, 14, H - 14);
+      // 녹음 막대 (불 속 누적 시간)
+      const bw = Math.min(200, W * 0.32), bx = W - bw - 14, by = H - 26;
+      ctx.fillStyle = 'rgba(255,255,255,0.12)'; rr(bx, by, bw, 10, 5); ctx.fill();
+      const f = Math.min(1, fireT / C.MELT);
+      ctx.fillStyle = f > 0.8 ? '#e2574c' : '#f3ead9'; rr(bx, by, Math.max(10, bw * f), 10, 5); ctx.fill();
+      ctx.textAlign = 'right'; ctx.fillStyle = '#a9a6b8';
+      ctx.fillText('녹음 ' + Math.ceil(Math.max(0, C.MELT - fireT)) + '초', W - 14, by - 6);
+    }
+
+    // D 연출: 마일스톤 팝, 돌연변이 배너
+    if (isTag()) {
+      pops.forEach(p => {
+        const f = p.life / p.max;
+        ctx.globalAlpha = 1 - f * f; ctx.textAlign = 'left'; ctx.fillStyle = '#ffc94d';
+        ctx.font = `${px(0.05)}px Jua, sans-serif`;
+        ctx.fillText(p.text, mx + s * 1.15, my - s * 0.2 - f * H * 0.08);
+        ctx.globalAlpha = 1;
+      });
+      if (banner) drawBanner(tt);
+    }
+    if (st === 'result') { if (isTag()) drawResultD(tt); else drawResult(); }
+    confetti.forEach(p => {
+      ctx.save(); ctx.globalAlpha = Math.max(0, 1 - p.life / p.max); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore();
+    });
+  }
+
+  function chip(x, y, label, on, color, scale = 1) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
+    ctx.font = `${px(0.036)}px "IBM Plex Sans KR", sans-serif`;
+    const w = ctx.measureText(label).width + 20, h = px(0.036) + 10;
+    rr(-w / 2, -h / 2, w, h, h / 2);
+    if (on) { ctx.fillStyle = color; ctx.fill(); ctx.fillStyle = '#1b1208'; }
+    else { ctx.strokeStyle = 'rgba(169,166,184,0.45)'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.fillStyle = 'rgba(169,166,184,0.75)'; }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, 0, 1);
+    ctx.textBaseline = 'alphabetic';
+    ctx.restore();
+    return w;
+  }
+
+  function drawTopD(tt, tele) {
+    const roasting = st === 'roasting';
+    const showRes = st === 'result';
+    const v = st === 'ready' ? 1 : showRes ? (res.burned ? 0 : res.value) : potNow();
+    const numY = H * 0.125, statusY = numY + Math.max(15, H * 0.052), chipY = statusY + Math.max(19, H * 0.05);
+    ctx.textAlign = 'center';
+    if (!showRes) {
+      const sc = 1 + 0.35 * bump;
+      ctx.save(); ctx.translate(W * 0.5, numY); ctx.scale(sc, sc);
+      ctx.fillStyle = tierColor(v, tt);
+      ctx.font = `${Math.round(H * 0.105)}px Jua, sans-serif`;
+      ctx.fillText(fmt(v), 0, 0);
+      ctx.restore();
+      ctx.font = `${px(0.036)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillStyle = tele ? '#ff8a3d' : '#a9a6b8';
+      ctx.fillText(roasting ? statusLine(tele) : '화면을 꾹 눌러 불에 넣어 봐 — 위 숫자는 지금 떼면 받는 배율', W * 0.5, statusY);
+    }
+    if (!roasting) return;
+    // 보너스 칩
+    const g = tagsNow();
+    const items = [
+      { label: g.edge === 3 ? '종이 한 장 ×3' : '한 끗 ×2', on: g.edge > 1, color: g.edge === 3 ? '#ff8fbf' : '#ffc94d' },
+      { label: '골고루 ×2', on: g.even > 1, color: '#7fd18b' }
+    ];
+    if (mut > 1) items.push({ label: `${mutName(mut)} ×${mut}`, on: true, color: mut >= 10 ? `hsl(${(tt * 140) % 360},90%,70%)` : '#ffd76a' });
+    items.push({ label: `굽기 ${fmt(m)}`, on: false, color: '' });
+    ctx.font = `${px(0.036)}px "IBM Plex Sans KR", sans-serif`;
+    const widths = items.map(it => ctx.measureText(it.label).width + 20);
+    const gap = 8, total = widths.reduce((a, b) => a + b, 0) + gap * (items.length - 1);
+    let x = W / 2 - total / 2;
+    items.forEach((it, i) => { chip(x + widths[i] / 2, chipY, it.label, it.on, it.color); x += widths[i] + gap; });
+  }
+
+  function drawBanner(tt) {
+    const f = banner.life / banner.max;
+    const sc = f < 0.15 ? 0.6 + 0.4 * (f / 0.15) + 0.25 * Math.sin(f / 0.15 * Math.PI) : 1;
+    ctx.save(); ctx.globalAlpha = f > 0.8 ? (1 - f) / 0.2 : 1;
+    ctx.translate(W / 2, H * 0.36); ctx.scale(sc, sc);
+    const w = Math.min(W * 0.78, 360), h = H * 0.15;
+    ctx.fillStyle = 'rgba(20,26,43,0.9)'; rr(-w / 2, -h / 2, w, h, 14); ctx.fill();
+    ctx.strokeStyle = banner.rain ? `hsl(${(tt * 200) % 360},90%,70%)` : '#ffd76a'; ctx.lineWidth = 2.5; rr(-w / 2, -h / 2, w, h, 14); ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = banner.rain ? `hsl(${(tt * 200) % 360},90%,72%)` : '#ffd76a';
+    ctx.font = `${Math.round(h * 0.36)}px Jua, sans-serif`; ctx.fillText(banner.text, 0, -h * 0.02);
+    ctx.fillStyle = '#f3ead9'; ctx.font = `${px(0.034)}px "IBM Plex Sans KR", sans-serif`; ctx.fillText(banner.sub, 0, h * 0.32);
+    ctx.restore();
+  }
+
+  function statusLine(tele) {
+    if (st === 'ready') return isHeat() ? '화면을 꾹 눌러 불에 넣어 봐' : '화면을 꾹 눌러 굽기 시작';
+    if (st === 'result') return res.burned ? '타 버렸다' : '뺐다!';
+    if (isHeat()) {
+      if (tele) return '불길이 일렁인다 — 들어!';
+      if (flareShow > 0) return '불길이 솟았다!';
+      const hot = Math.max(...heat);
+      if (hot > 85) return `제일 뜨거운 면 ${Math.round(hot)} — 위험!`;
+      if (isTag()) return holding ? '굽는 중 — 칩을 켜고 떼' : '들고 식히는 중 (배율 멈춤)';
+      return holding ? '굽는 중 — 돌리면서 버텨' : '들고 식히는 중 (배율 멈춤)';
+    }
+    if (!holding) return '';
+    if (mode === 'B') { const ratio = m / D; if (ratio > 0.93) return '지글지글… 곧 탈 것 같다'; if (ratio > r) return '연기가 나기 시작했다'; }
+    return '굽는 중';
+  }
+
+  function drawMarshAB(mx, my, s, burned, tt) {
+    ctx.save(); ctx.translate(mx, my);
+    if (mode === 'B' && st === 'roasting' && m / D > 0.93) ctx.translate(Math.sin(tt * 70) * 2, Math.cos(tt * 63) * 1.5);
+    const c = burned ? [30, 24, 22] : toastColor(st === 'ready' ? 1 : m);
+    ctx.fillStyle = rgb(c); rr(-s * 0.5, -s * 0.55, s, s * 1.1, s * 0.28); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)'; rr(-s * 0.36, -s * 0.45, s * 0.22, s * 0.6, s * 0.1); ctx.fill();
+    if (burned) drawFlamesOn(s, tt);
+    ctx.restore();
+  }
+
+  function drawMarshC(mx, my, s, burned, tt) {
+    // D 돌연변이 빛
+    if (isTag() && mut > 1 && !burned && st !== 'ready') {
+      const col = mut >= 10 ? `hsla(${(tt * 140) % 360},95%,65%,` : 'rgba(255,215,106,';
+      const gr = ctx.createRadialGradient(mx, my, s * 0.3, mx, my, s * 1.5);
+      gr.addColorStop(0, col + '0.55)'); gr.addColorStop(1, col + '0)');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(mx, my, s * 1.5, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 6; i++) {
+        const a = tt * 1.6 + i * Math.PI / 3, rad = s * (1.05 + 0.12 * Math.sin(tt * 5 + i));
+        const sx = mx + Math.cos(a) * rad, sy = my + Math.sin(a) * rad, z = 3 + 2 * Math.sin(tt * 7 + i * 2);
+        ctx.fillStyle = mut >= 10 ? `hsl(${(tt * 140 + i * 60) % 360},95%,75%)` : '#fff3c4';
+        ctx.beginPath(); ctx.moveTo(sx, sy - z * 2); ctx.lineTo(sx + z * 0.6, sy); ctx.lineTo(sx, sy + z * 2); ctx.lineTo(sx - z * 0.6, sy); ctx.closePath(); ctx.fill();
+      }
+    }
+    ctx.save(); ctx.translate(mx, my);
+    const ang = -spinVis * Math.PI / 2;
+    ctx.rotate(ang);
+    const mean = heat.reduce((a, b) => a + b, 0) / 4;
+    ctx.fillStyle = burned ? 'rgb(30,24,22)' : rgb(heatColor(mean * 0.8));
+    rr(-s * 0.52, -s * 0.52, s * 1.04, s * 1.04, s * 0.26); ctx.fill();
+    if (!burned) {
+      // 면 4개: 0 아래 · 1 왼쪽 · 2 위 · 3 오른쪽 (회전 전 기준)
+      const band = s * 0.2;
+      ctx.save(); rr(-s * 0.52, -s * 0.52, s * 1.04, s * 1.04, s * 0.26); ctx.clip();
+      const faces = [[-s, s * 0.52 - band, 2 * s, band], [-s * 0.52, -s, band, 2 * s], [-s, -s * 0.52, 2 * s, band], [s * 0.52 - band, -s, band, 2 * s]];
+      faces.forEach((f, i) => { ctx.fillStyle = rgb(heatColor(heat[i])); ctx.fillRect(f[0], f[1], f[2], f[3]); });
+      ctx.restore();
+      if (isTag() && mut > 1 && st !== 'ready') {
+        ctx.strokeStyle = mut >= 10 ? `hsl(${(tt * 140) % 360},95%,70%)` : '#ffd76a'; ctx.lineWidth = 3;
+        rr(-s * 0.52, -s * 0.52, s * 1.04, s * 1.04, s * 0.26); ctx.stroke();
+      }
+    }
+    ctx.restore();
+    // 면 온도 고리 (화면 기준 아래·왼쪽·위·오른쪽)
+    if (st === 'roasting' && !burned) {
+      const R = s * 0.92, pos = { 0: Math.PI / 2, 1: Math.PI, 2: -Math.PI / 2, 3: 0 };
+      for (let i = 0; i < 4; i++) {
+        const screenSlot = (i - down + 4) % 4; // 이 면이 지금 화면 어디에 있나
+        const a = pos[screenSlot], h = heat[i];
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 7;
+        ctx.beginPath(); ctx.arc(mx, my, R, a - 0.62, a + 0.62); ctx.stroke();
+        ctx.strokeStyle = h > 85 ? '#e2574c' : h > 60 ? '#ffc94d' : '#7fd18b'; ctx.lineWidth = 7;
+        ctx.beginPath(); ctx.arc(mx, my, R, a - 0.62, a - 0.62 + 1.24 * Math.min(1, h / 100)); ctx.stroke();
+        if (isTag()) { // 한 끗 눈금 (93)
+          const ta = a - 0.62 + 1.24 * BONUS.EDGE1 / 100;
+          ctx.strokeStyle = 'rgba(255,201,77,0.8)'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(mx + Math.cos(ta) * (R - 6), my + Math.sin(ta) * (R - 6)); ctx.lineTo(mx + Math.cos(ta) * (R + 6), my + Math.sin(ta) * (R + 6)); ctx.stroke();
+        }
+      }
+    }
+    if (burned) { ctx.save(); ctx.translate(mx, my); drawFlamesOn(s, tt); ctx.restore(); }
+  }
+
+  function drawFlamesOn(s, tt) {
+    for (let i = 0; i < 3; i++) {
+      ctx.fillStyle = ['#ff6a2b', '#ff9a3c', '#ffd25a'][i];
+      ctx.beginPath();
+      const w = s * (0.5 - i * 0.13), h = s * (1.1 - i * 0.25) + Math.sin(tt * 12 + i) * s * 0.08;
+      ctx.moveTo(-w, -s * 0.3); ctx.quadraticCurveTo(-w * 0.6, -s * 0.3 - h * 0.7, 0, -s * 0.3 - h); ctx.quadraticCurveTo(w * 0.6, -s * 0.3 - h * 0.7, w, -s * 0.3); ctx.closePath(); ctx.fill();
+    }
+  }
+
+  function drawResult() {
+    const w = Math.min(W * 0.8, 360), h = H * 0.2, x = (W - w) / 2, y = H * 0.25;
+    ctx.fillStyle = 'rgba(20,26,43,0.88)'; rr(x, y, w, h, 14); ctx.fill();
+    ctx.strokeStyle = res.burned ? '#e2574c' : '#ffc94d'; ctx.lineWidth = 2; rr(x, y, w, h, 14); ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = res.burned ? '#e2574c' : '#ffc94d';
+    ctx.font = `${Math.round(h * 0.3)}px Jua, sans-serif`;
+    ctx.fillText(res.burned ? '타 버렸다' : `${fmt(res.value)} 받음`, W / 2, y + h * 0.42);
+    ctx.fillStyle = '#f3ead9';
+    ctx.font = `${Math.max(11, Math.round(h * 0.16))}px "IBM Plex Sans KR", sans-serif`;
+    let sub = '';
+    if (res.D) sub = res.burned ? `운명이 ${fmt(res.D)}였어` : `운명은 ${fmt(res.D)}였어 — ${res.D / res.value > 2 ? '아깝다!' : '잘 뺐다'}`;
+    else sub = res.burned ? `제일 뜨거운 면이 100을 넘었어` : res.melt ? '녹기 직전이라 자동으로 뺐어' : `제일 뜨거운 면 ${Math.round(res.maxHeat)}에서 뺐어`;
+    ctx.fillText(sub, W / 2, y + h * 0.76);
+  }
+
+  function drawResultD(tt) {
+    const w = Math.min(W * 0.88, 440), h = Math.max(140, H * 0.31), x = (W - w) / 2, y = H * 0.025;
+    ctx.fillStyle = 'rgba(20,26,43,0.92)'; rr(x, y, w, h, 16); ctx.fill();
+    const fin = !res.burned && resT >= res.finalAt;
+    ctx.strokeStyle = res.burned ? '#e2574c' : fin ? tierColor(res.value, tt) : '#2f3a5e'; ctx.lineWidth = 2.5; rr(x, y, w, h, 16); ctx.stroke();
+    ctx.textAlign = 'center';
+    if (res.burned) {
+      ctx.fillStyle = '#e2574c'; ctx.font = `${Math.round(h * 0.2)}px Jua, sans-serif`;
+      ctx.fillText(res.mut > 1 ? `${mutName(res.mut)} 마시멜로가 타 버렸다` : '타 버렸다', W / 2, y + h * 0.36);
+      ctx.fillStyle = '#f3ead9'; ctx.font = `${px(0.042)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillText(`직전에 뗐으면 ${fmt(res.lost)}였어`, W / 2, y + h * 0.6);
+      ctx.fillStyle = '#a9a6b8'; ctx.font = `${px(0.034)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillText('제일 뜨거운 면이 100을 넘었어', W / 2, y + h * 0.8);
+      return;
+    }
+    // 1) 굽기 배율
+    ctx.fillStyle = '#a9a6b8'; ctx.font = `${px(0.04)}px "IBM Plex Sans KR", sans-serif`;
+    ctx.fillText(`굽기 ${fmt(res.base)}`, W / 2, y + h * 0.17);
+    // 2) 보너스가 하나씩 쾅
+    if (res.steps.length) {
+      ctx.font = `${px(0.036)}px "IBM Plex Sans KR", sans-serif`;
+      const labels = res.steps.map(s => `${s.label} ×${s.x}`);
+      const widths = labels.map(l => ctx.measureText(l).width + 20), gap = 8;
+      const total = widths.reduce((a, b) => a + b, 0) + gap * (labels.length - 1);
+      let cx = W / 2 - total / 2;
+      res.steps.forEach((s, i) => {
+        const t0 = 0.4 + 0.38 * i, k = resT - t0;
+        if (k >= 0) {
+          if (!s.fired) { s.fired = true; SND.slam(i); shake = Math.max(shake, 4 + i * 2); }
+          const sc = k < 0.16 ? 1.8 - 0.8 * (k / 0.16) : 1;
+          const col = s.mut ? (s.x >= 10 ? `hsl(${(tt * 140) % 360},90%,70%)` : '#ffd76a') : s.label === '골고루' ? '#7fd18b' : s.x === 3 ? '#ff8fbf' : '#ffc94d';
+          chip(cx + widths[i] / 2, y + h * 0.36, labels[i], true, col, sc);
+        }
+        cx += widths[i] + gap;
+      });
+    } else {
+      ctx.fillStyle = '#a9a6b8'; ctx.font = `${px(0.034)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillText(`보너스 없음 — 제일 뜨거운 면 ${Math.round(res.maxHeat)} (한 끗은 ${BONUS.EDGE1}↑)`, W / 2, y + h * 0.36);
+    }
+    // 3) 최종 숫자 카운트업
+    if (resT >= res.finalAt || !res.steps.length) {
+      const k = Math.min(1, (resT - res.finalAt) / 0.45);
+      const v = res.steps.length ? res.base * Math.pow(res.value / res.base, Math.max(0, k)) : res.value;
+      const sc = k < 1 ? 1 : 1 + 0.12 * Math.max(0, 1 - (resT - res.finalAt - 0.45) * 4);
+      ctx.save(); ctx.translate(W / 2, y + h * 0.7); ctx.scale(sc, sc);
+      ctx.fillStyle = tierColor(v, tt); ctx.font = `${Math.round(h * 0.26)}px Jua, sans-serif`;
+      ctx.fillText(fmt(v), 0, 0); ctx.restore();
+      ctx.fillStyle = '#a9a6b8'; ctx.font = `${px(0.034)}px "IBM Plex Sans KR", sans-serif`;
+      ctx.fillText(res.melt ? '녹기 직전이라 자동으로 뺐어' : '받음', W / 2, y + h * 0.88);
+    }
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    update(dt); draw(now);
+    requestAnimationFrame(loop);
+  }
+  renderSnd(); resize(); setMode(mode); requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>
